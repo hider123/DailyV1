@@ -8,11 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- React Libraries -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <!-- Babel to transpile JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
@@ -33,6 +28,20 @@
             width: 100%;
             height: 100%;
         }
+        
+        /* --- Animation Keyframes --- */
+        @keyframes heart-bounce {
+            0%, 100% { transform: scale(1); }
+            30% { transform: scale(1.3); }
+            60% { transform: scale(0.9); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Page Transition --- */
         .page {
             position: absolute;
             top: 0;
@@ -43,13 +52,16 @@
             flex-direction: column;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s ease-in-out;
+            transform: scale(0.98);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             background-color: inherit;
         }
         .page.is-active {
            opacity: 1;
            pointer-events: auto;
+           transform: scale(1);
         }
+
         #share-modal-container, #add-member-modal-container {
             visibility: hidden; opacity: 0;
             transition: visibility 0s 0.3s, opacity 0.3s linear;
@@ -89,10 +101,58 @@
         .like-button .heart-icon-outline { display: inline-block; }
         .like-button .heart-icon-solid { display: none; }
         .like-button.liked .heart-icon-outline { display: none; }
-        .like-button.liked .heart-icon-solid { display: inline-block; color: #ef4444; } /* red-500 */
+        
+        /* --- Like Button Animation --- */
+        .like-button.liked .heart-icon-solid {
+            display: inline-block;
+            color: #ef4444; /* red-500 */
+            animation: heart-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
         .explore-tab.active {
             border-bottom-color: #f59e0b;
             color: #0f172a;
+        }
+        .tab-content.hidden {
+            display: none;
+        }
+        
+        /* --- Tab Content Animation --- */
+        .tab-content {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .map-pin {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-color: #ef4444;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 2px solid white;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .map-pin::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -102,12 +162,40 @@
         <div class="page-container">
 
             <!-- ================================================== -->
+            <!-- =====         登入/註冊頁 (Auth)             ===== -->
+            <!-- ================================================== -->
+            <div id="auth-screen" class="page is-active">
+                <div class="flex flex-col justify-center items-center h-full p-8 bg-amber-50">
+                    <h1 class="text-4xl font-bold text-amber-800 mb-2">家庭時光膠囊</h1>
+                    <p class="text-amber-700 mb-10">珍藏您的家庭回憶</p>
+                    
+                    <div class="w-full max-w-sm">
+                        <div class="mb-4">
+                            <label for="email" class="block text-amber-800 text-sm font-bold mb-2">電子郵件</label>
+                            <input type="email" id="email" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-amber-400" placeholder="you@example.com">
+                        </div>
+                        <div class="mb-6">
+                            <label for="password" class="block text-amber-800 text-sm font-bold mb-2">密碼</label>
+                            <input type="password" id="password" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-amber-400" placeholder="******************">
+                        </div>
+                        <div id="auth-error" class="text-red-500 text-xs italic mb-4 h-4"></div>
+                        <div class="flex flex-col space-y-3">
+                            <button id="login-button" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors flex items-center justify-center">登入</button>
+                            <button id="register-button" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors flex items-center justify-center">註冊新帳號</button>
+                            <button id="guest-button" class="text-amber-700 hover:text-amber-900 text-sm font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">訪客瀏覽</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ================================================== -->
             <!-- =====            主畫面 (Home)                 ===== -->
             <!-- ================================================== -->
-            <div id="home-screen" class="page is-active">
+            <div id="home-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200 flex-shrink-0">
                     <div class="flex justify-between items-center">
-                        <div><h1 class="text-xl font-bold text-gray-800">下午好，林媽媽！</h1></div>
+                        <div><h1 id="greeting" class="text-xl font-bold text-gray-800">下午好！</h1></div>
                         <div class="flex items-center space-x-4">
                             <button id="settings-button" class="text-gray-500 hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066 2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
                         </div>
@@ -135,27 +223,145 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></div>
                     </div>
                 </header>
+                
+                <!-- Tab Navigation -->
+                <div class="flex justify-around border-b border-gray-200 bg-white flex-shrink-0">
+                    <button data-tab="footprints" class="explore-tab py-3 px-4 font-semibold text-gray-500 border-b-2 border-transparent w-full">最近足跡</button>
+                    <button data-tab="discover" class="explore-tab py-3 px-4 font-semibold text-gray-500 border-b-2 border-transparent w-full active">探索</button>
+                    <button data-tab="following" class="explore-tab py-3 px-4 font-semibold text-gray-500 border-b-2 border-transparent w-full">追蹤</button>
+                </div>
+
                 <div class="overflow-y-auto flex-1">
-                    <main class="p-4 pb-24">
-                        <div class="mb-6">
-                             <h2 class="text-base font-bold text-gray-700 mb-3">熱門標籤</h2>
-                             <div class="tag-carousel flex space-x-3 overflow-x-auto pb-2">
-                                <button class="px-4 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold flex-shrink-0">#親子景點</button>
-                                <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#戶外露營</button>
-                                <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#美食之旅</button>
-                                <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#咖啡廳</button>
-                                <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#海邊走走</button>
-                             </div>
-                        </div>
-                        <h2 class="text-base font-bold text-gray-700 mb-3">熱門創作者</h2><div class="flex space-x-4 overflow-x-auto pb-3">
-                            <div class="creator-card text-center flex-shrink-0 cursor-pointer"><img class="w-16 h-16 rounded-full border-2 border-amber-400 p-1" src="https://placehold.co/100x100/fde68a/a16207?text=媽" alt="Creator 1"><p class="text-xs mt-1">旅行的媽咪</p></div>
-                            <div class="creator-card text-center flex-shrink-0 cursor-pointer"><img class="w-16 h-16 rounded-full border-2 border-gray-200 p-1" src="https://placehold.co/100x100/dbeafe/1e3a8a?text=爸" alt="Creator 2"><p class="text-xs mt-1">攝影老爸</p></div>
-                        </div><h2 class="text-base font-bold text-gray-700 mt-6 mb-3">精選日記</h2><div class="masonry">
-                        <div class="masonry-item"><div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"><img src="https://placehold.co/400x500/fb923c/ffffff?text=露營" alt="Diary 1"><div class="p-3"><p class="text-sm font-semibold truncate">我們的第一次森林露營</p><p class="text-xs text-gray-500">by 旅行的媽咪</p><div class="flex items-center text-xs text-gray-400 mt-2"><span class="mr-3 flex items-center">👁️ 8.2k</span><span class="flex items-center">❤️ 1.2k</span></div></div></div></div>
-                        <div class="masonry-item"><div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"><img src="https://placehold.co/400x300/f87171/ffffff?text=野餐" alt="Diary 2"><div class="p-3"><p class="text-sm font-semibold truncate">城市公園的午後野餐</p><p class="text-xs text-gray-500">by 攝影老爸</p><div class="flex items-center text-xs text-gray-400 mt-2"><span class="mr-3 flex items-center">👁️ 6.5k</span><span class="flex items-center">❤️ 980</span></div></div></div></div>
-                        <div class="masonry-item"><div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"><img src="https://placehold.co/400x400/a78bfa/ffffff?text=古蹟" alt="Diary 3"><div class="p-3"><p class="text-sm font-semibold truncate">台南古蹟散步</p><p class="text-xs text-gray-500">by 娃娃看天下</p><div class="flex items-center text-xs text-gray-400 mt-2"><span class="mr-3 flex items-center">👁️ 4.1k</span><span class="flex items-center">❤️ 760</span></div></div></div></div>
-                        <div class="masonry-item"><div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"><img src="https://placehold.co/400x600/4ade80/ffffff?text=農場" alt="Diary 4"><div class="p-3"><p class="text-sm font-semibold truncate">清境農場餵羊初體驗</p><p class="text-xs text-gray-500">by 寶寶去哪兒</p><div class="flex items-center text-xs text-gray-400 mt-2"><span class="mr-3 flex items-center">👁️ 9.8k</span><span class="flex items-center">❤️ 2.3k</span></div></div></div></div>
-                    </div></main>
+                    <!-- Discover Content (Original Explore Page) -->
+                    <div id="discover-content" class="tab-content">
+                        <main class="p-4 pb-24">
+                            <div class="mb-6">
+                                 <h2 class="text-base font-bold text-gray-700 mb-3">熱門標籤</h2>
+                                 <div class="tag-carousel flex space-x-3 overflow-x-auto pb-2">
+                                    <button class="px-4 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold flex-shrink-0">#親子景點</button>
+                                    <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#戶外露營</button>
+                                    <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#美食之旅</button>
+                                    <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#咖啡廳</button>
+                                    <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#海邊走走</button>
+                                 </div>
+                            </div>
+                            <h2 class="text-base font-bold text-gray-700 mb-3">熱門創作者</h2><div class="flex space-x-4 overflow-x-auto pb-3">
+                                <div class="creator-card text-center flex-shrink-0 cursor-pointer"><img class="w-16 h-16 rounded-full border-2 border-amber-400 p-1" src="https://placehold.co/100x100/fde68a/a16207?text=媽" alt="Creator 1"><p class="text-xs mt-1">旅行的媽咪</p></div>
+                                <div class="creator-card text-center flex-shrink-0 cursor-pointer"><img class="w-16 h-16 rounded-full border-2 border-gray-200 p-1" src="https://placehold.co/100x100/dbeafe/1e3a8a?text=爸" alt="Creator 2"><p class="text-xs mt-1">攝影老爸</p></div>
+                            </div><h2 class="text-base font-bold text-gray-700 mt-6 mb-3">精選日記</h2><div class="masonry">
+                            <div class="masonry-item"><div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"><img src="https://placehold.co/400x500/fb923c/ffffff?text=露營" alt="Diary 1"><div class="p-3"><p class="text-sm font-semibold truncate">我們的第一次森林露營</p><p class="text-xs text-gray-500">by 旅行的媽咪</p><div class="flex items-center text-xs text-gray-400 mt-2"><span class="mr-3 flex items-center">👁️ 8.2k</span><span class="flex items-center">❤️ 1.2k</span></div></div></div></div>
+                            <div class="masonry-item"><div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"><img src="https://placehold.co/400x300/f87171/ffffff?text=野餐" alt="Diary 2"><div class="p-3"><p class="text-sm font-semibold truncate">城市公園的午後野餐</p><p class="text-xs text-gray-500">by 攝影老爸</p><div class="flex items-center text-xs text-gray-400 mt-2"><span class="mr-3 flex items-center">👁️ 6.5k</span><span class="flex items-center">❤️ 980</span></div></div></div></div>
+                            <div class="masonry-item"><div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"><img src="https://placehold.co/400x400/a78bfa/ffffff?text=古蹟" alt="Diary 3"><div class="p-3"><p class="text-sm font-semibold truncate">台南古蹟散步</p><p class="text-xs text-gray-500">by 娃娃看天下</p><div class="flex items-center text-xs text-gray-400 mt-2"><span class="mr-3 flex items-center">👁️ 4.1k</span><span class="flex items-center">❤️ 760</span></div></div></div></div>
+                            <div class="masonry-item"><div class="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"><img src="https://placehold.co/400x600/4ade80/ffffff?text=農場" alt="Diary 4"><div class="p-3"><p class="text-sm font-semibold truncate">清境農場餵羊初體驗</p><p class="text-xs text-gray-500">by 寶寶去哪兒</p><div class="flex items-center text-xs text-gray-400 mt-2"><span class="mr-3 flex items-center">👁️ 9.8k</span><span class="flex items-center">❤️ 2.3k</span></div></div></div></div>
+                        </div></main>
+                    </div>
+
+                    <!-- Footprints Content -->
+                    <div id="footprints-content" class="tab-content hidden">
+                        <main class="p-4 pb-24 space-y-4">
+                            <div class="relative mb-4 rounded-lg overflow-hidden shadow-md">
+                                <img src="https://storage.googleapis.com/gemini-prod-us-west1-423901-8354/images/20240810_taiwan_map_prototype.png" alt="台灣足跡地圖" class="w-full h-48 object-cover">
+                                <!-- Map Pins -->
+                                <div class="map-pin" style="top: 25%; left: 78%;" title="台北市，陽明山"></div>
+                                <div class="map-pin" style="top: 35%; left: 85%;" title="宜蘭縣，冬山河親水公園"></div>
+                                <div class="map-pin" style="top: 80%; left: 20%;" title="我們溫暖的家 (高雄)"></div>
+                            </div>
+                            <div class="flex items-center bg-white p-3 rounded-lg shadow-sm">
+                                <img src="https://placehold.co/100x100/34D399/FFFFFF?text=山" class="w-16 h-16 rounded-lg object-cover mr-4">
+                                <div>
+                                    <h3 class="font-bold">陽明山繡球花之旅</h3>
+                                    <p class="text-sm text-gray-500">2025年8月4日</p>
+                                    <p class="text-xs text-gray-400">1 則日記</p>
+                                </div>
+                            </div>
+                             <div class="flex items-center bg-white p-3 rounded-lg shadow-sm">
+                                <img src="https://placehold.co/100x100/FBBF24/FFFFFF?text=家" class="w-16 h-16 rounded-lg object-cover mr-4">
+                                <div>
+                                    <h3 class="font-bold">我們溫暖的家</h3>
+                                    <p class="text-sm text-gray-500">2025年7月20日</p>
+                                    <p class="text-xs text-gray-400">3 則日記</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-white p-3 rounded-lg shadow-sm">
+                                <img src="https://placehold.co/100x100/60A5FA/FFFFFF?text=水" class="w-16 h-16 rounded-lg object-cover mr-4">
+                                <div>
+                                    <h3 class="font-bold">宜蘭縣冬山河親水公園</h3>
+                                    <p class="text-sm text-gray-500">2025年7月5日</p>
+                                    <p class="text-xs text-gray-400">1 則日記</p>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+
+                    <!-- Following Content -->
+                    <div id="following-content" class="tab-content hidden">
+                        <main class="pb-24">
+                            <!-- Stories Section -->
+                            <div class="p-4 border-b border-gray-200 bg-white">
+                                <h3 class="text-sm font-semibold text-gray-600 mb-3">即時動態</h3>
+                                <div class="flex space-x-4 overflow-x-auto pb-2 tag-carousel">
+                                    <!-- Story Item with new story -->
+                                    <div class="text-center flex-shrink-0 cursor-pointer">
+                                        <div class="relative w-16 h-16 mx-auto">
+                                            <img class="w-full h-full rounded-full p-1 object-cover" src="https://placehold.co/100x100/dbeafe/1e3a8a?text=爸" alt="Creator 2">
+                                            <div class="absolute inset-0 rounded-full ring-2 ring-amber-400 ring-offset-2"></div>
+                                        </div>
+                                        <p class="text-xs mt-2">攝影老爸</p>
+                                    </div>
+                                    <!-- Story Item already viewed -->
+                                    <div class="text-center flex-shrink-0 cursor-pointer">
+                                         <div class="relative w-16 h-16 mx-auto">
+                                            <img class="w-full h-full rounded-full p-1 object-cover border-2 border-gray-300" src="https://placehold.co/100x100/fde68a/a16207?text=媽" alt="Creator 1">
+                                        </div>
+                                        <p class="text-xs mt-2">旅行的媽咪</p>
+                                    </div>
+                                    <div class="text-center flex-shrink-0 cursor-pointer">
+                                         <div class="relative w-16 h-16 mx-auto">
+                                            <img class="w-full h-full rounded-full p-1 object-cover border-2 border-gray-300" src="https://placehold.co/100x100/fce7f3/831843?text=娃" alt="Creator 3">
+                                        </div>
+                                        <p class="text-xs mt-2">娃娃看天下</p>
+                                    </div>
+                                     <div class="text-center flex-shrink-0 cursor-pointer">
+                                        <div class="relative w-16 h-16 mx-auto">
+                                            <img class="w-full h-full rounded-full p-1 object-cover ring-2 ring-amber-400 ring-offset-2" src="https://placehold.co/100x100/4ade80/ffffff?text=寶" alt="Creator 4">
+                                        </div>
+                                        <p class="text-xs mt-2">寶寶去哪兒</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Feed Section -->
+                            <div class="p-4 space-y-6">
+                                <div class="memory-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer">
+                                    <div class="p-4 flex items-center space-x-3 border-b">
+                                        <img class="w-10 h-10 rounded-full" src="https://placehold.co/100x100/dbeafe/1e3a8a?text=爸" alt="Creator 2">
+                                        <div>
+                                            <p class="font-semibold text-sm">攝影老爸</p>
+                                            <p class="text-xs text-gray-400">2 小時前</p>
+                                        </div>
+                                    </div>
+                                    <img src="https://placehold.co/600x400/f87171/ffffff?text=野餐" alt="城市公園的午後野餐" class="w-full h-48 object-cover">
+                                    <div class="p-4">
+                                        <h2 class="text-lg font-bold text-gray-800">城市公園的午後野餐</h2>
+                                        <p class="text-sm text-gray-600 mt-2">今天天氣真好，帶著家人一起到公園野餐，享受悠閒的午後時光...</p>
+                                    </div>
+                                </div>
+                                <div class="memory-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer">
+                                    <div class="p-4 flex items-center space-x-3 border-b">
+                                        <img class="w-10 h-10 rounded-full" src="https://placehold.co/100x100/fde68a/a16207?text=媽" alt="Creator 1">
+                                        <div>
+                                            <p class="font-semibold text-sm">旅行的媽咪</p>
+                                            <p class="text-xs text-gray-400">昨天</p>
+                                        </div>
+                                    </div>
+                                    <img src="https://placehold.co/600x400/fb923c/ffffff?text=露營" alt="我們的第一次森林露營" class="w-full h-48 object-cover">
+                                    <div class="p-4">
+                                        <h2 class="text-lg font-bold text-gray-800">我們的第一次森林露營</h2>
+                                        <p class="text-sm text-gray-600 mt-2">夜晚的星空好美，孩子們第一次看到這麼多星星，都興奮得睡不著覺！</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
                 </div>
             </div>
 
@@ -348,7 +554,7 @@
                              <button id="go-to-groups" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>👨‍👩‍👧‍👦 管理我的群組</span><span>&gt;</span></button>
                              <button id="go-to-writing-style" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>✍️ AI 寫作風格</span><span>&gt;</span></button>
                              <button class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>🔔 通知設定</span><span>&gt;</span></button>
-                             <button class="w-full text-left text-red-500 bg-white p-4 rounded-lg border">登出帳號</button>
+                             <button id="logout-button" class="w-full text-left text-red-500 bg-white p-4 rounded-lg border">登出帳號</button>
                         </div>
                     </main>
                 </div>
@@ -532,7 +738,7 @@
 
             <!-- ===== 底部導覽列 ===== -->
             <nav id="bottom-nav" class="absolute bottom-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-sm border-t border-gray-200 flex justify-around items-center z-20">
-                <button data-target="home-screen" class="bottom-nav-item text-center text-gray-500 active"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><p class="text-xs mt-1">首頁</p></button>
+                <button data-target="home-screen" class="bottom-nav-item text-center text-gray-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><p class="text-xs mt-1">首頁</p></button>
                 <button id="fab-nav" class="bg-amber-500 hover:bg-amber-600 text-white w-16 h-16 rounded-full shadow-lg flex items-center justify-center transform -mt-8"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg></button>
                 <button data-target="explore-screen" class="bottom-nav-item text-center text-gray-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 16.382V5.618a1 1 0 00-1.447-.894L15 7m-6 3l6-3" /></svg><p class="text-xs mt-1">探索</p></button>
             </nav>
@@ -556,256 +762,389 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const pages = document.querySelectorAll('.page');
-            const navItems = document.querySelectorAll('.bottom-nav-item');
-            const bottomNav = document.getElementById('bottom-nav');
-            let navigationStack = ['home-screen'];
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-            function showPage(targetId, isSubPage = false) {
-                pages.forEach(page => {
-                    page.classList.toggle('is-active', page.id === targetId);
-                });
-                bottomNav.style.display = isSubPage ? 'none' : 'flex';
-            }
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyAoVd0MJy5TjwuEF8xPntGmyu3tpHEUuts",
+          authDomain: "family-time-capsule-ac438.firebaseapp.com",
+          projectId: "family-time-capsule-ac438",
+          storageBucket: "family-time-capsule-ac438.appspot.com",
+          messagingSenderId: "717537356458",
+          appId: "1:717537356458:web:59caf3c60cd45d2529bed3"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // --- DOM Elements ---
+        const pages = document.querySelectorAll('.page');
+        const navItems = document.querySelectorAll('.bottom-nav-item');
+        const bottomNav = document.getElementById('bottom-nav');
+        const greeting = document.getElementById('greeting');
+        const authError = document.getElementById('auth-error');
+
+        let navigationStack = ['auth-screen']; // Start with auth screen
+
+        function showPage(targetId, isSubPage = false) {
+            pages.forEach(page => {
+                page.classList.toggle('is-active', page.id === targetId);
+            });
             
-            function navigateTo(targetId) {
-                const isSubPage = !['home-screen', 'explore-screen'].includes(targetId);
+            // Hide bottom nav on auth screen and sub-pages
+            const showNav = !isSubPage && targetId !== 'auth-screen';
+            bottomNav.style.display = showNav ? 'flex' : 'none';
+        }
+        
+        function navigateTo(targetId) {
+            const isSubPage = !['home-screen', 'explore-screen', 'auth-screen'].includes(targetId);
+            showPage(targetId, isSubPage);
+            if (navigationStack[navigationStack.length - 1] !== targetId) {
+                navigationStack.push(targetId);
+            }
+        }
+
+        function goBack() {
+            if (navigationStack.length > 1) {
+                navigationStack.pop();
+                const targetId = navigationStack[navigationStack.length - 1];
+                const isSubPage = !['home-screen', 'explore-screen', 'auth-screen'].includes(targetId);
                 showPage(targetId, isSubPage);
-                if (navigationStack[navigationStack.length - 1] !== targetId) {
-                    navigationStack.push(targetId);
-                }
-            }
-
-            function goBack() {
-                if (navigationStack.length > 1) {
-                    navigationStack.pop();
-                    const targetId = navigationStack[navigationStack.length - 1];
-                    const isSubPage = !['home-screen', 'explore-screen'].includes(targetId);
-                    showPage(targetId, isSubPage);
-                    navItems.forEach(nav => {
-                        nav.classList.toggle('active', nav.dataset.target === targetId);
-                    });
-                }
-            }
-            
-            // --- Event Listeners ---
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const targetId = item.dataset.target;
-                    navigationStack = [targetId];
-                    navigateTo(targetId);
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    item.classList.add('active');
+                navItems.forEach(nav => {
+                    nav.classList.toggle('active', nav.dataset.target === targetId);
                 });
+            }
+        }
+        
+        // --- Auth State Listener ---
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                // User is signed in
+                console.log("User is signed in:", user);
+                if (user.isAnonymous) {
+                    greeting.textContent = "下午好，訪客！";
+                } else {
+                    // A simple way to get a name from email, you can improve this later
+                    const name = user.email.split('@')[0];
+                    greeting.textContent = `下午好，${name}！`;
+                }
+                navigationStack = ['home-screen'];
+                navigateTo('home-screen');
+                navItems.forEach(nav => nav.classList.remove('active'));
+                document.querySelector('.bottom-nav-item[data-target="home-screen"]').classList.add('active');
+
+            } else {
+                // User is signed out
+                console.log("User is signed out.");
+                navigationStack = ['auth-screen'];
+                navigateTo('auth-screen');
+            }
+        });
+
+
+        // --- Auth UI Logic ---
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('login-button');
+        const registerButton = document.getElementById('register-button');
+        const guestButton = document.getElementById('guest-button');
+        const logoutButton = document.getElementById('logout-button');
+
+        function setButtonLoading(button, isLoading) {
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = '<div class="spinner"></div>';
+            } else {
+                button.disabled = false;
+                button.innerHTML = button.dataset.originalText;
+            }
+        }
+        
+        loginButton.dataset.originalText = loginButton.innerHTML;
+        registerButton.dataset.originalText = registerButton.innerHTML;
+        
+        loginButton.addEventListener('click', async () => {
+            setButtonLoading(loginButton, true);
+            authError.textContent = '';
+            try {
+                await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+            } catch (error) {
+                authError.textContent = "登入失敗：" + error.message;
+            } finally {
+                setButtonLoading(loginButton, false);
+            }
+        });
+
+        registerButton.addEventListener('click', async () => {
+            setButtonLoading(registerButton, true);
+            authError.textContent = '';
+            try {
+                await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+            } catch (error) {
+                authError.textContent = "註冊失敗：" + error.message;
+            } finally {
+                setButtonLoading(registerButton, false);
+            }
+        });
+        
+        guestButton.addEventListener('click', async () => {
+             try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                authError.textContent = "訪客登入失敗：" + error.message;
+            }
+        });
+
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error("Logout failed:", error);
+            }
+        });
+
+
+        // --- Original Prototype Logic (with modifications) ---
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetId = item.dataset.target;
+                navigationStack = [targetId];
+                navigateTo(targetId);
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
             });
+        });
 
-            document.getElementById('fab-nav').addEventListener('click', () => navigateTo('create-screen'));
-            document.querySelectorAll('.memory-card, #explore-screen .masonry-item, #profile-screen .masonry-item, .featured-carousel > div').forEach(card => card.addEventListener('click', () => navigateTo('detail-screen')));
-            document.querySelectorAll('#explore-screen .creator-card').forEach(card => card.addEventListener('click', () => navigateTo('profile-screen')));
-            document.getElementById('settings-button').addEventListener('click', () => navigateTo('pro-screen'));
-            document.querySelectorAll('.go-back-button').forEach(button => button.addEventListener('click', goBack));
-            
-            // --- Settings/Pro Page ---
-            document.getElementById('go-to-earnings').addEventListener('click', () => navigateTo('earnings-screen'));
-            document.getElementById('go-to-groups').addEventListener('click', () => navigateTo('groups-screen'));
-            document.querySelectorAll('#groups-screen .group-item').forEach(item => item.addEventListener('click', () => navigateTo('group-edit-screen')));
-            document.getElementById('create-group-button').addEventListener('click', () => navigateTo('group-create-screen'));
-            document.getElementById('go-to-profile-edit').addEventListener('click', () => navigateTo('profile-edit-screen'));
-            document.getElementById('go-to-writing-style').addEventListener('click', () => navigateTo('writing-style-screen'));
-
-
-            // --- Create Diary Page ---
-            const titleInput = document.getElementById('diary-title');
-            const generateButton = document.getElementById('generate-button');
-            const photoUpload = document.getElementById('photo-upload');
-            const photoCarouselContainer = document.getElementById('photo-carousel-container');
-            const photoCountSpan = document.getElementById('photo-count');
+        document.getElementById('fab-nav').addEventListener('click', () => navigateTo('create-screen'));
+        document.querySelectorAll('.memory-card, #explore-screen .masonry-item, #profile-screen .masonry-item, .featured-carousel > div').forEach(card => card.addEventListener('click', () => navigateTo('detail-screen')));
+        document.querySelectorAll('#explore-screen .creator-card').forEach(card => card.addEventListener('click', () => navigateTo('profile-screen')));
+        document.getElementById('settings-button').addEventListener('click', () => navigateTo('pro-screen'));
+        document.querySelectorAll('.go-back-button').forEach(button => button.addEventListener('click', goBack));
+        
+        // --- Settings/Pro Page ---
+        document.getElementById('go-to-earnings').addEventListener('click', () => navigateTo('earnings-screen'));
+        document.getElementById('go-to-groups').addEventListener('click', () => navigateTo('groups-screen'));
+        document.querySelectorAll('#groups-screen .group-item').forEach(item => item.addEventListener('click', () => navigateTo('group-edit-screen')));
+        document.getElementById('create-group-button').addEventListener('click', () => navigateTo('group-create-screen'));
+        document.getElementById('go-to-profile-edit').addEventListener('click', () => navigateTo('profile-edit-screen'));
+        document.getElementById('go-to-writing-style').addEventListener('click', () => navigateTo('writing-style-screen'));
 
 
-            if(photoUpload) {
-                photoUpload.addEventListener('change', (event) => {
-                    const files = event.target.files;
-                    if (files.length > 0) {
-                        photoCarouselContainer.innerHTML = ''; // Clear placeholder
+        // --- Create Diary Page ---
+        const titleInput = document.getElementById('diary-title');
+        const generateButton = document.getElementById('generate-button');
+        const photoUpload = document.getElementById('photo-upload');
+        const photoCarouselContainer = document.getElementById('photo-carousel-container');
+        const photoCountSpan = document.getElementById('photo-count');
+
+
+        if(photoUpload) {
+            photoUpload.addEventListener('change', (event) => {
+                const files = event.target.files;
+                if (files.length > 0) {
+                    photoCarouselContainer.innerHTML = ''; // Clear placeholder
+                }
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = "rounded-lg h-40 object-cover flex-shrink-0";
+                        photoCarouselContainer.appendChild(img);
                     }
-                    for (const file of files) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.className = "rounded-lg h-40 object-cover flex-shrink-0";
-                            photoCarouselContainer.appendChild(img);
-                        }
-                        reader.readAsDataURL(file);
-                    }
-                    photoCountSpan.textContent = `已選取的照片 (${files.length})`;
-                });
-            }
+                    reader.readAsDataURL(file);
+                }
+                photoCountSpan.textContent = `已選取的照片 (${files.length})`;
+            });
+        }
 
-            if(titleInput) {
-                titleInput.addEventListener('input', () => {
-                    const hasText = titleInput.value.trim().length > 0;
-                    generateButton.disabled = !hasText;
-                });
-            }
+        if(titleInput) {
+            titleInput.addEventListener('input', () => {
+                const hasText = titleInput.value.trim().length > 0;
+                generateButton.disabled = !hasText;
+            });
+        }
 
-            if(generateButton) {
-                generateButton.addEventListener('click', () => {
-                    if (!generateButton.disabled) {
-                        navigateTo('interactive-question-screen');
-                    }
-                });
-            }
+        if(generateButton) {
+            generateButton.addEventListener('click', () => {
+                if (!generateButton.disabled) {
+                    navigateTo('interactive-question-screen');
+                }
+            });
+        }
+        
+        // --- Interactive Question Page ---
+        const skipQuestionButton = document.getElementById('skip-question-button');
+        const continueGenerationButton = document.getElementById('continue-generation-button');
+        
+        function proceedToGeneration() {
+            document.getElementById('detail-title').textContent = titleInput.value;
+            navigateTo('loading-screen');
+            setTimeout(() => {
+                navigationStack.pop(); // remove question page
+                navigationStack.pop(); // remove create page
+                navigateTo('detail-screen');
+            }, 2500);
+        }
+
+        if(skipQuestionButton) skipQuestionButton.addEventListener('click', proceedToGeneration);
+        if(continueGenerationButton) continueGenerationButton.addEventListener('click', proceedToGeneration);
+
+
+        // --- Detail Page ---
+        const editButton = document.getElementById('edit-button');
+        if(editButton) {
+            editButton.addEventListener('click', () => {
+                document.getElementById('edit-intro-text').value = document.getElementById('detail-intro-text').textContent;
+                document.getElementById('edit-body-text').value = document.getElementById('detail-body-text').textContent;
+                navigateTo('edit-screen');
+            });
+        }
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('liked');
+            })
+        });
+
+        // --- Edit Page ---
+        const saveButton = document.getElementById('save-button');
+        if(saveButton) {
+            saveButton.addEventListener('click', () => {
+                document.getElementById('detail-intro-text').textContent = document.getElementById('edit-intro-text').value;
+                document.getElementById('detail-body-text').textContent = document.getElementById('edit-body-text').value;
+                goBack();
+            });
+        }
+
+        // --- Share Modal Logic ---
+        const shareButton = document.getElementById('share-button');
+        const modalContainer = document.getElementById('share-modal-container');
+        if (shareButton) {
+            shareButton.addEventListener('click', () => modalContainer.classList.add('visible'));
+            document.getElementById('close-modal-button').addEventListener('click', () => modalContainer.classList.remove('visible'));
+            document.getElementById('done-button').addEventListener('click', () => modalContainer.classList.remove('visible'));
+            document.getElementById('share-modal-backdrop').addEventListener('click', () => modalContainer.classList.remove('visible'));
             
-            // --- Interactive Question Page ---
-            const skipQuestionButton = document.getElementById('skip-question-button');
-            const continueGenerationButton = document.getElementById('continue-generation-button');
-            
-            function proceedToGeneration() {
-                document.getElementById('detail-title').textContent = titleInput.value;
-                navigateTo('loading-screen');
-                setTimeout(() => {
-                    navigationStack.pop(); // remove question page
-                    navigationStack.pop(); // remove create page
-                    navigateTo('detail-screen');
-                }, 2500);
-            }
-
-            if(skipQuestionButton) skipQuestionButton.addEventListener('click', proceedToGeneration);
-            if(continueGenerationButton) continueGenerationButton.addEventListener('click', proceedToGeneration);
-
-
-            // --- Detail Page ---
-            const editButton = document.getElementById('edit-button');
-            if(editButton) {
-                editButton.addEventListener('click', () => {
-                    document.getElementById('edit-intro-text').value = document.getElementById('detail-intro-text').textContent;
-                    document.getElementById('edit-body-text').value = document.getElementById('detail-body-text').textContent;
-                    navigateTo('edit-screen');
-                });
-            }
-            document.querySelectorAll('.like-button').forEach(button => {
+            document.querySelectorAll('.share-group-button').forEach(button => {
                 button.addEventListener('click', () => {
-                    button.classList.toggle('liked');
-                })
-            });
-
-            // --- Edit Page ---
-            const saveButton = document.getElementById('save-button');
-            if(saveButton) {
-                saveButton.addEventListener('click', () => {
-                    document.getElementById('detail-intro-text').textContent = document.getElementById('edit-intro-text').value;
-                    document.getElementById('detail-body-text').textContent = document.getElementById('edit-body-text').value;
-                    goBack();
-                });
-            }
-
-            // --- Share Modal Logic ---
-            const shareButton = document.getElementById('share-button');
-            const modalContainer = document.getElementById('share-modal-container');
-            if (shareButton) {
-                shareButton.addEventListener('click', () => modalContainer.classList.add('visible'));
-                document.getElementById('close-modal-button').addEventListener('click', () => modalContainer.classList.remove('visible'));
-                document.getElementById('done-button').addEventListener('click', () => modalContainer.classList.remove('visible'));
-                document.getElementById('share-modal-backdrop').addEventListener('click', () => modalContainer.classList.remove('visible'));
-                
-                document.querySelectorAll('.share-group-button').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const groupName = button.querySelector('span:last-child').textContent;
-                        alert(`日記已分享給 ${groupName}！`);
-                        modalContainer.classList.remove('visible');
-                    });
-                });
-
-                const copyButton = document.getElementById('copy-link-button');
-                copyButton.addEventListener('click', () => {
-                    const linkInput = copyButton.previousElementSibling;
-                    navigator.clipboard.writeText(linkInput.value).then(() => {
-                        copyButton.textContent = '已複製!';
-                        copyButton.classList.remove('bg-amber-500');
-                        copyButton.classList.add('bg-green-500');
-                        setTimeout(() => { copyButton.textContent = '複製'; copyButton.classList.remove('bg-green-500'); copyButton.classList.add('bg-amber-500'); }, 2000);
-                    });
-                });
-            }
-            
-            // --- Add Member Modal Logic ---
-            const addMemberButton = document.getElementById('add-member-button');
-            const addMemberModalContainer = document.getElementById('add-member-modal-container');
-            const inviteLinkDetails = document.getElementById('invite-link-details');
-
-            if (addMemberButton) {
-                addMemberButton.addEventListener('click', () => {
-                    inviteLinkDetails.classList.add('hidden'); // Reset state
-                    addMemberModalContainer.classList.add('visible');
-                });
-            }
-
-            const closeAddMemberModalButton = document.getElementById('close-add-member-modal-button');
-            const addMemberModalBackdrop = document.getElementById('add-member-modal-backdrop');
-
-            function closeAddMemberModal() {
-                if(addMemberModalContainer) addMemberModalContainer.classList.remove('visible');
-            }
-
-            if(closeAddMemberModalButton) closeAddMemberModalButton.addEventListener('click', closeAddMemberModal);
-            if(addMemberModalBackdrop) addMemberModalBackdrop.addEventListener('click', closeAddMemberModal);
-
-            document.querySelectorAll('.invite-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.target.textContent = '已邀請';
-                    e.target.disabled = true;
-                    e.target.classList.remove('bg-blue-500');
-                    e.target.classList.add('bg-gray-200', 'text-gray-500', 'cursor-not-allowed');
-                    alert('已送出邀請！');
+                    const groupName = button.querySelector('span:last-child').textContent;
+                    alert(`日記已分享給 ${groupName}！`);
+                    modalContainer.classList.remove('visible');
                 });
             });
-            
-            const generateInviteLinkButton = document.getElementById('generate-invite-link');
-            if(generateInviteLinkButton) {
-                generateInviteLinkButton.addEventListener('click', () => {
-                    inviteLinkDetails.classList.toggle('hidden');
-                });
-            }
-            
-            const copyInviteLinkButton = document.getElementById('copy-invite-link-button');
-            if(copyInviteLinkButton) {
-                 copyInviteLinkButton.addEventListener('click', () => {
-                    const linkInput = copyInviteLinkButton.previousElementSibling;
-                    navigator.clipboard.writeText(linkInput.value).then(() => {
-                        alert('邀請連結已複製！');
-                    });
-                });
-            }
 
-            // --- Emoji Picker Logic ---
-            const emojiPickerButton = document.getElementById('emoji-picker-button');
-            if (emojiPickerButton) {
-                const emojis = ['🍽️', '🏕️', '🎂', '🏖️', '✈️', '🎉', '🏠'];
-                let currentIndex = 0;
-                emojiPickerButton.addEventListener('click', () => {
-                    currentIndex = (currentIndex + 1) % emojis.length;
-                    emojiPickerButton.textContent = emojis[currentIndex];
+            const copyButton = document.getElementById('copy-link-button');
+            copyButton.addEventListener('click', () => {
+                const linkInput = copyButton.previousElementSibling;
+                navigator.clipboard.writeText(linkInput.value).then(() => {
+                    copyButton.textContent = '已複製!';
+                    copyButton.classList.remove('bg-amber-500');
+                    copyButton.classList.add('bg-green-500');
+                    setTimeout(() => { copyButton.textContent = '複製'; copyButton.classList.remove('bg-green-500'); copyButton.classList.add('bg-amber-500'); }, 2000);
                 });
-            }
+            });
+        }
+        
+        // --- Add Member Modal Logic ---
+        const addMemberButton = document.getElementById('add-member-button');
+        const addMemberModalContainer = document.getElementById('add-member-modal-container');
+        const inviteLinkDetails = document.getElementById('invite-link-details');
 
-            // --- Writing Style Logic ---
-            const customPromptTextarea = document.getElementById('custom-prompt-style');
-            if(customPromptTextarea) {
-                document.querySelectorAll('input[name="writing-style-option"]').forEach(radio => {
-                    radio.addEventListener('change', (event) => {
-                        if (event.target.value === 'custom') {
-                            customPromptTextarea.disabled = false;
-                            customPromptTextarea.classList.remove('bg-gray-50');
-                        } else {
-                            customPromptTextarea.disabled = true;
-                            customPromptTextarea.classList.add('bg-gray-50');
-                        }
-                    });
+        if (addMemberButton) {
+            addMemberButton.addEventListener('click', () => {
+                inviteLinkDetails.classList.add('hidden'); // Reset state
+                addMemberModalContainer.classList.add('visible');
+            });
+        }
+
+        const closeAddMemberModalButton = document.getElementById('close-add-member-modal-button');
+        const addMemberModalBackdrop = document.getElementById('add-member-modal-backdrop');
+
+        function closeAddMemberModal() {
+            if(addMemberModalContainer) addMemberModalContainer.classList.remove('visible');
+        }
+
+        if(closeAddMemberModalButton) closeAddMemberModalButton.addEventListener('click', closeAddMemberModal);
+        if(addMemberModalBackdrop) addMemberModalBackdrop.addEventListener('click', closeAddMemberModal);
+
+        document.querySelectorAll('.invite-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.target.textContent = '已邀請';
+                e.target.disabled = true;
+                e.target.classList.remove('bg-blue-500');
+                e.target.classList.add('bg-gray-200', 'text-gray-500', 'cursor-not-allowed');
+                alert('已送出邀請！');
+            });
+        });
+        
+        const generateInviteLinkButton = document.getElementById('generate-invite-link');
+        if(generateInviteLinkButton) {
+            generateInviteLinkButton.addEventListener('click', () => {
+                inviteLinkDetails.classList.toggle('hidden');
+            });
+        }
+        
+        const copyInviteLinkButton = document.getElementById('copy-invite-link-button');
+        if(copyInviteLinkButton) {
+             copyInviteLinkButton.addEventListener('click', () => {
+                const linkInput = copyInviteLinkButton.previousElementSibling;
+                navigator.clipboard.writeText(linkInput.value).then(() => {
+                    alert('邀請連結已複製！');
                 });
-            }
+            });
+        }
+
+        // --- Emoji Picker Logic ---
+        const emojiPickerButton = document.getElementById('emoji-picker-button');
+        if (emojiPickerButton) {
+            const emojis = ['🍽️', '🏕️', '🎂', '🏖️', '✈️', '🎉', '🏠'];
+            let currentIndex = 0;
+            emojiPickerButton.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % emojis.length;
+                emojiPickerButton.textContent = emojis[currentIndex];
+            });
+        }
+
+        // --- Writing Style Logic ---
+        const customPromptTextarea = document.getElementById('custom-prompt-style');
+        if(customPromptTextarea) {
+            document.querySelectorAll('input[name="writing-style-option"]').forEach(radio => {
+                radio.addEventListener('change', (event) => {
+                    if (event.target.value === 'custom') {
+                        customPromptTextarea.disabled = false;
+                        customPromptTextarea.classList.remove('bg-gray-50');
+                    } else {
+                        customPromptTextarea.disabled = true;
+                        customPromptTextarea.classList.add('bg-gray-50');
+                    }
+                });
+            });
+        }
+
+        // --- Explore Page Tab Logic ---
+        const exploreTabs = document.querySelectorAll('.explore-tab');
+        const tabContents = document.querySelectorAll('#explore-screen .tab-content');
+
+        exploreTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Deactivate all tabs and content
+                exploreTabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.add('hidden'));
+
+                // Activate clicked tab and its content
+                tab.classList.add('active');
+                const contentId = tab.dataset.tab + '-content';
+                document.getElementById(contentId).classList.remove('hidden');
+            });
         });
     </script>
 </body>
