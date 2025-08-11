@@ -62,11 +62,11 @@
            transform: scale(1);
         }
 
-        #share-modal-container, #add-member-modal-container {
+        .modal-container {
             visibility: hidden; opacity: 0;
             transition: visibility 0s 0.3s, opacity 0.3s linear;
         }
-        #share-modal-container.visible, #add-member-modal-container.visible {
+        .modal-container.visible {
             visibility: visible; opacity: 1;
             transition: opacity 0.3s linear;
         }
@@ -446,7 +446,10 @@
                     </div>
                     </main>
                 </div>
-                <footer class="p-5 bg-white/80 backdrop-blur-sm border-t border-gray-200 flex-shrink-0"><button id="save-diary-button" class="w-full bg-amber-500 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-amber-600 transition-all disabled:bg-gray-300 disabled:shadow-none" disabled>下一步</button></footer>
+                <footer class="p-5 bg-white/80 backdrop-blur-sm border-t border-gray-200 flex-shrink-0">
+                    <div id="create-error" class="text-red-500 text-xs italic mb-2 h-4 text-center"></div>
+                    <button id="save-diary-button" class="w-full bg-amber-500 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-amber-600 transition-all disabled:bg-gray-300 disabled:shadow-none" disabled>下一步</button>
+                </footer>
             </div>
 
             <!-- ================================================== -->
@@ -489,7 +492,7 @@
                     </div>
                     <div class="pt-2 pb-4 text-center"><button class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">🖨️ 將這份回憶印成書</button></div></div></main>
                 </div>
-                <div id="share-modal-container" class="absolute inset-0 z-30"><div id="share-modal-backdrop" class="absolute inset-0 bg-black/40"></div><div id="share-modal-panel" class="absolute bottom-0 left-0 right-0 bg-slate-50 rounded-t-2xl p-5 shadow-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold text-gray-900">分享這份回憶</h2><button id="close-modal-button" class="text-gray-400 hover:text-gray-700">&times;</button></div>
+                <div id="share-modal-container" class="modal-container absolute inset-0 z-30"><div id="share-modal-backdrop" class="absolute inset-0 bg-black/40"></div><div id="share-modal-panel" class="absolute bottom-0 left-0 right-0 bg-slate-50 rounded-t-2xl p-5 shadow-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold text-gray-900">分享這份回憶</h2><button id="close-modal-button" class="text-gray-400 hover:text-gray-700">&times;</button></div>
                 <div class="mt-4">
                     <h3 class="text-base font-semibold text-gray-800 mb-3">分享給群組</h3>
                     <div class="space-y-2">
@@ -744,7 +747,7 @@
             </nav>
             
             <!-- ===== 新增成員彈窗 ===== -->
-            <div id="add-member-modal-container" class="absolute inset-0 z-40"><div id="add-member-modal-backdrop" class="absolute inset-0 bg-black/40"></div><div id="add-member-modal-panel" class="absolute bottom-0 left-0 right-0 bg-slate-50 rounded-t-2xl p-5 shadow-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold text-gray-900">新增成員</h2><button id="close-add-member-modal-button" class="text-gray-400 hover:text-gray-700 text-2xl">&times;</button></div><div class="relative"><input type="text" placeholder="搜尋使用者名稱..." class="w-full bg-white border border-gray-200 rounded-full py-2 pl-10 pr-4"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div></div><div class="mt-4 space-y-2"><div class="bg-white p-3 rounded-lg border flex justify-between items-center"><div class="flex items-center"><img src="https://placehold.co/100x100/dbeafe/1e3a8a?text=爸" class="w-10 h-10 rounded-full mr-3"><div><p class="font-semibold">攝影老爸</p><p class="text-xs text-gray-500">@photodad</p></div></div><button class="invite-button bg-blue-500 text-white text-sm font-semibold px-3 py-1 rounded-full">邀請</button></div><div class="bg-white p-3 rounded-lg border flex justify-between items-center"><div class="flex items-center"><img src="https://placehold.co/100x100/fce7f3/831843?text=娃" class="w-10 h-10 rounded-full mr-3"><div><p class="font-semibold">娃娃看天下</p><p class="text-xs text-gray-500">@wawaworld</p></div></div><button class="bg-gray-200 text-gray-500 text-sm font-semibold px-3 py-1 rounded-full cursor-not-allowed">已邀請</button></div></div>
+            <div id="add-member-modal-container" class="modal-container absolute inset-0 z-40"><div id="add-member-modal-backdrop" class="absolute inset-0 bg-black/40"></div><div id="add-member-modal-panel" class="absolute bottom-0 left-0 right-0 bg-slate-50 rounded-t-2xl p-5 shadow-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold text-gray-900">新增成員</h2><button id="close-add-member-modal-button" class="text-gray-400 hover:text-gray-700 text-2xl">&times;</button></div><div class="relative"><input type="text" placeholder="搜尋使用者名稱..." class="w-full bg-white border border-gray-200 rounded-full py-2 pl-10 pr-4"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div></div><div class="mt-4 space-y-2"><div class="bg-white p-3 rounded-lg border flex justify-between items-center"><div class="flex items-center"><img src="https://placehold.co/100x100/dbeafe/1e3a8a?text=爸" class="w-10 h-10 rounded-full mr-3"><div><p class="font-semibold">攝影老爸</p><p class="text-xs text-gray-500">@photodad</p></div></div><button class="invite-button bg-blue-500 text-white text-sm font-semibold px-3 py-1 rounded-full">邀請</button></div><div class="bg-white p-3 rounded-lg border flex justify-between items-center"><div class="flex items-center"><img src="https://placehold.co/100x100/fce7f3/831843?text=娃" class="w-10 h-10 rounded-full mr-3"><div><p class="font-semibold">娃娃看天下</p><p class="text-xs text-gray-500">@wawaworld</p></div></div><button class="bg-gray-200 text-gray-500 text-sm font-semibold px-3 py-1 rounded-full cursor-not-allowed">已邀請</button></div></div>
                 <div class="mt-6 text-center">
                     <p class="text-sm text-gray-500 mb-2">或</p>
                     <button id="generate-invite-link" class="w-full bg-green-500 text-white font-bold py-3 rounded-lg">產生邀請連結</button>
@@ -758,6 +761,19 @@
                     </div>
                 </div>
             </div></div>
+
+            <!-- ===== 訪客提示彈窗 ===== -->
+            <div id="guest-modal" class="modal-container absolute inset-0 z-50 flex items-center justify-center p-8">
+                <div class="absolute inset-0 bg-black/40"></div>
+                <div class="relative bg-white rounded-2xl p-6 text-center shadow-xl">
+                    <h2 class="text-lg font-bold text-gray-800">需要登入喔！</h2>
+                    <p class="text-sm text-gray-600 mt-2">為了確保您的珍貴回憶不會遺失，建立日記需要一個正式帳號。</p>
+                    <div class="mt-6 flex flex-col space-y-2">
+                        <button id="go-to-auth-button" class="w-full bg-amber-500 text-white font-bold py-2 px-4 rounded-lg">前往登入 / 註冊</button>
+                        <button id="close-guest-modal-button" class="w-full text-gray-500 text-sm py-2 px-4 rounded-lg">稍後再說</button>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -792,6 +808,8 @@
         const bottomNav = document.getElementById('bottom-nav');
         const greeting = document.getElementById('greeting');
         const authError = document.getElementById('auth-error');
+        const createError = document.getElementById('create-error');
+        const guestModal = document.getElementById('guest-modal');
 
         let navigationStack = ['auth-screen']; // Start with auth screen
 
@@ -837,10 +855,12 @@
                     const name = user.email.split('@')[0];
                     greeting.textContent = `下午好，${name}！`;
                 }
-                navigationStack = ['home-screen'];
-                navigateTo('home-screen');
-                navItems.forEach(nav => nav.classList.remove('active'));
-                document.querySelector('.bottom-nav-item[data-target="home-screen"]').classList.add('active');
+                if(navigationStack[0] === 'auth-screen') {
+                    navigationStack = ['home-screen'];
+                    navigateTo('home-screen');
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    document.querySelector('.bottom-nav-item[data-target="home-screen"]').classList.add('active');
+                }
 
             } else {
                 // User is signed out
@@ -924,7 +944,14 @@
             });
         });
 
-        document.getElementById('fab-nav').addEventListener('click', () => navigateTo('create-screen'));
+        document.getElementById('fab-nav').addEventListener('click', () => {
+            const user = auth.currentUser;
+            if (user && user.isAnonymous) {
+                guestModal.classList.add('visible');
+            } else {
+                navigateTo('create-screen');
+            }
+        });
         document.querySelectorAll('.memory-card, #explore-screen .masonry-item, #profile-screen .masonry-item, .featured-carousel > div').forEach(card => card.addEventListener('click', () => navigateTo('detail-screen')));
         document.querySelectorAll('#explore-screen .creator-card').forEach(card => card.addEventListener('click', () => navigateTo('profile-screen')));
         document.getElementById('settings-button').addEventListener('click', () => navigateTo('pro-screen'));
@@ -979,10 +1006,11 @@
         saveDiaryButton.addEventListener('click', async (e) => {
             e.preventDefault();
             setButtonLoading(saveDiaryButton, true);
+            createError.textContent = '';
 
             const user = auth.currentUser;
             if (!user) {
-                alert("請先登入！");
+                createError.textContent = "錯誤：您尚未登入。";
                 setButtonLoading(saveDiaryButton, false);
                 return;
             }
@@ -1012,7 +1040,7 @@
 
             } catch (error) {
                 console.error("儲存日記時發生錯誤: ", error);
-                alert("儲存失敗，請稍後再試。");
+                createError.textContent = "儲存失敗，請檢查您的 Firestore 安全性規則。";
             } finally {
                 setButtonLoading(saveDiaryButton, false);
             }
@@ -1182,6 +1210,17 @@
                 document.getElementById(contentId).classList.remove('hidden');
             });
         });
+
+        // --- Guest Modal Logic ---
+        document.getElementById('close-guest-modal-button').addEventListener('click', () => {
+            guestModal.classList.remove('visible');
+        });
+        document.getElementById('go-to-auth-button').addEventListener('click', async () => {
+            guestModal.classList.remove('visible');
+            await signOut(auth); // Log out from anonymous session
+            navigateTo('auth-screen');
+        });
+
     </script>
 </body>
 </html>
