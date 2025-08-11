@@ -948,8 +948,11 @@
             const user = auth.currentUser;
             if (user && user.isAnonymous) {
                 guestModal.classList.add('visible');
-            } else {
+            } else if (user) {
                 navigateTo('create-screen');
+            } else {
+                // Should not happen due to onAuthStateChanged, but as a fallback
+                navigateTo('auth-screen');
             }
         });
         document.querySelectorAll('.memory-card, #explore-screen .masonry-item, #profile-screen .masonry-item, .featured-carousel > div').forEach(card => card.addEventListener('click', () => navigateTo('detail-screen')));
@@ -1040,7 +1043,7 @@
 
             } catch (error) {
                 console.error("儲存日記時發生錯誤: ", error);
-                createError.textContent = "儲存失敗，請檢查您的 Firestore 安全性規則。";
+                createError.textContent = "儲存失敗：權限不足。請檢查您的 Firestore 安全性規則。";
             } finally {
                 setButtonLoading(saveDiaryButton, false);
             }
