@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Image Compression Library -->
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
@@ -760,12 +762,12 @@
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyAoVd0MJy5TjwuEF8xPntGmyu3tpHEUuts",
-            authDomain: "family-time-capsule-ac438.firebaseapp.com",
-            projectId: "family-time-capsule-ac438",
-            storageBucket: "family-time-capsule-ac438.firebasestorage.app",
-            messagingSenderId: "717537356458",
-            appId: "1:717537356458:web:59caf3c60cd45d2529bed3"
+          apiKey: "AIzaSyAoVd0MJy5TjwuEF8xPntGmyu3tpHEUuts",
+          authDomain: "family-time-capsule-ac438.firebaseapp.com",
+          projectId: "family-time-capsule-ac438",
+          storageBucket: "family-time-capsule-ac438.appspot.com",
+          messagingSenderId: "717537356458",
+          appId: "1:717537356458:web:59caf3c60cd45d2529bed3"
         };
         
         // Initialize Firebase
@@ -838,7 +840,7 @@
 
             detailContainer.innerHTML = `
                 <div class="relative">
-                    <img src="${coverImage}" alt="日記封面" class="w-full h-64 object-cover">
+                    <img src="${coverImage}" alt="日記封面" class="w-full h-64 object-contain bg-gray-200">
                     <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
                         <p id="detail-intro-text" class="text-white text-lg leading-relaxed">${diary.intro || '...'}</p>
                     </div>
@@ -1140,13 +1142,21 @@
             const styleText = styleMapping[styleValue] || '溫馨感性風';
             
             try {
-                // --- Step 1: Upload Photos to Firebase Storage ---
+                // --- Step 1: Compress and Upload Photos to Firebase Storage ---
                 const uploadedPhotoURLs = [];
                 if (selectedFiles.length > 0) {
                     const uploadPromises = selectedFiles.map(async (file) => {
-                        const filePath = `diaries/${user.uid}/${Date.now()}-${file.name}`;
+                        const options = {
+                            maxSizeMB: 1,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true
+                        }
+                        const compressedFile = await imageCompression(file, options);
+                        console.log(`Compressed ${file.name} from ${file.size/1024/1024} MB to ${compressedFile.size/1024/1024} MB`);
+
+                        const filePath = `diaries/${user.uid}/${Date.now()}-${compressedFile.name}`;
                         const storageRef = ref(storage, filePath);
-                        const snapshot = await uploadBytes(storageRef, file);
+                        const snapshot = await uploadBytes(storageRef, compressedFile);
                         const downloadURL = await getDownloadURL(snapshot.ref);
                         return downloadURL;
                     });
