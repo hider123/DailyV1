@@ -153,8 +153,28 @@
             height: 16px;
             animation: spin 1s linear infinite;
         }
+        .spinner-small {
+            border: 2px solid rgba(128, 128, 128, 0.3);
+            border-top-color: #666;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* --- Timeline Styles --- */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0; /* gray-200 */
         }
     </style>
 </head>
@@ -164,7 +184,7 @@
         <div class="page-container">
 
             <!-- ================================================== -->
-            <!-- =====         登入/註冊頁 (Auth)             ===== -->
+            <!-- =====     登入/註冊頁 (Auth)         ===== -->
             <!-- ================================================== -->
             <div id="auth-screen" class="page is-active">
                 <div class="flex flex-col justify-center items-center h-full p-8 bg-amber-50">
@@ -192,14 +212,14 @@
 
 
             <!-- ================================================== -->
-            <!-- =====            主畫面 (Home)                 ===== -->
+            <!-- =====        主畫面 (Home)             ===== -->
             <!-- ================================================== -->
             <div id="home-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200 flex-shrink-0">
                     <div class="flex justify-between items-center">
                         <div><h1 id="greeting" class="text-xl font-bold text-gray-800">下午好！</h1></div>
                         <div class="flex items-center space-x-4">
-                            <button id="settings-button" class="text-gray-500 hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066 2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
+                            <button id="settings-button" class="text-gray-500 hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
                         </div>
                     </div>
                 </header>
@@ -211,7 +231,7 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====         社群探索頁 (Explore)             ===== -->
+            <!-- =====       社群探索頁 (Explore)         ===== -->
             <!-- ================================================== -->
             <div id="explore-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200 flex-shrink-0">
@@ -235,11 +255,11 @@
                             <div class="mb-6">
                                  <h2 class="text-base font-bold text-gray-700 mb-3">熱門標籤</h2>
                                  <div class="tag-carousel flex space-x-3 overflow-x-auto pb-2">
-                                    <button class="px-4 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold flex-shrink-0">#親子景點</button>
-                                    <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#戶外露營</button>
-                                    <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#美食之旅</button>
-                                    <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#咖啡廳</button>
-                                    <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#海邊走走</button>
+                                     <button class="px-4 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold flex-shrink-0">#親子景點</button>
+                                     <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#戶外露營</button>
+                                     <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#美食之旅</button>
+                                     <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#咖啡廳</button>
+                                     <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#海邊走走</button>
                                  </div>
                             </div>
                             <h2 class="text-base font-bold text-gray-700 mb-3">熱門創作者</h2><div class="flex space-x-4 overflow-x-auto pb-3">
@@ -363,7 +383,7 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====       創作者個人主頁 (Profile)           ===== -->
+            <!-- =====    創作者個人主頁 (Profile)        ===== -->
             <!-- ================================================== -->
             <div id="profile-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200 flex items-center flex-shrink-0">
@@ -406,22 +426,31 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====        建立新日記頁 (Create)             ===== -->
+            <!-- =====      建立新日記頁 (Create)         ===== -->
             <!-- ================================================== -->
             <div id="create-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex justify-between items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900">取消</button><h1 class="text-base font-bold text-gray-800">建立新的回憶</h1></header>
                 <div class="overflow-y-auto flex-1">
-                    <main class="p-5"><h2 class="text-lg font-semibold text-gray-700 mb-3">
+                    <main class="p-5">
+                        <h2 class="text-lg font-semibold text-gray-700 mb-3">
                             <span id="photo-count">已選取的照片 (0)</span>
                         </h2>
-                        <div id="photo-carousel-container" class="photo-carousel flex space-x-3 overflow-x-auto pb-3">
-                            <label for="photo-upload" class="w-full h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer">
-                                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                <span class="mt-2 text-sm text-gray-500">點擊此處上傳照片</span>
+                        <!-- MODIFIED: Changed from flexbox carousel to grid -->
+                        <div id="photo-grid-container" class="grid grid-cols-2 gap-4">
+                            <!-- Photos will be dynamically inserted here by JS -->
+                            <label for="photo-upload" class="aspect-square bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
+                                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                <span class="mt-2 text-sm text-gray-500">新增照片</span>
                             </label>
                         </div>
                         <input type="file" id="photo-upload" multiple accept="image/*" class="hidden">
-                        <div class="mt-6"><label for="diary-title" class="text-lg font-semibold text-gray-700">日記標題</label><input type="text" id="diary-title" placeholder="為這份回憶取個名字吧！" class="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400"></div>
+                        <div class="mt-6 relative">
+                            <label for="diary-title" class="text-lg font-semibold text-gray-700">日記標題</label>
+                            <div class="flex items-center">
+                                <input type="text" id="diary-title" placeholder="為這份回憶取個名字吧！" class="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400">
+                                <button id="ai-title-button" class="ml-2 mt-2 p-3 bg-amber-200 text-amber-800 rounded-lg hover:bg-amber-300 transition-colors">✨</button>
+                            </div>
+                        </div>
                     <div class="mt-6">
                         <h3 class="text-lg font-semibold text-gray-700 mb-2">誰可以看見？</h3>
                         <select id="privacy-select" class="w-full p-3 border border-gray-300 rounded-lg bg-white">
@@ -430,7 +459,7 @@
                             <option value="public">🌐 公開到社群</option>
                         </select>
                     </div>
-                     <div class="mt-6">
+                       <div class="mt-6">
                         <h3 class="text-lg font-semibold text-gray-700 mb-2">AI 寫作風格</h3>
                         <div class="space-y-2">
                             <label class="flex items-start p-3 bg-white border-2 border-amber-400 rounded-lg"><input type="radio" name="writing-style" value="warm" class="mt-1 text-amber-500 focus:ring-amber-400" checked><div class="ml-3"><p class="font-semibold">溫馨感性風</p></div></label>
@@ -450,7 +479,7 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====          日記詳情頁 (Detail)             ===== -->
+            <!-- =====       日記詳情頁 (Detail)         ===== -->
             <!-- ================================================== -->
             <div id="detail-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-20 flex justify-between items-center border-b border-gray-200 flex-shrink-0">
@@ -479,7 +508,7 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====           編輯日記頁 (Edit)              ===== -->
+            <!-- =====       編輯日記頁 (Edit)         ===== -->
             <!-- ================================================== -->
             <div id="edit-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex justify-between items-center flex-shrink-0">
@@ -505,14 +534,14 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====           生成中... (Loading)            ===== -->
+            <!-- =====       生成中... (Loading)         ===== -->
             <!-- ================================================== -->
             <div id="loading-screen" class="page">
                 <div class="m-auto text-center p-8"><div class="bg-amber-400 p-8 rounded-2xl"><svg class="animate-spin h-12 w-12 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><h2 class="text-2xl font-bold mt-6 text-white">AI 正在為您撰寫故事...</h2><p id="countdown-timer" class="mt-2 text-white/80">請稍候...</p></div></div>
             </div>
             
             <!-- ================================================== -->
-            <!-- =====         設定頁 (Settings)                ===== -->
+            <!-- =====       設定頁 (Settings)           ===== -->
             <!-- ================================================== -->
             <div id="pro-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">設定</h1></header>
@@ -527,7 +556,7 @@
                             <span>&gt;</span>
                         </button>
                         <div class="mt-8 space-y-2">
-                             <button id="go-to-earnings" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>💰 創作者收益中心</span><span>&gt;</span></button>
+                             <button id="go-to-earnings" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>� 創作者收益中心</span><span>&gt;</span></button>
                              <button id="go-to-groups" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>👨‍👩‍👧‍👦 管理我的群組</span><span>&gt;</span></button>
                              <button id="go-to-writing-style" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>✍️ AI 寫作風格</span><span>&gt;</span></button>
                              <button class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>🔔 通知設定</span><span>&gt;</span></button>
@@ -538,46 +567,46 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====       創作者收益頁 (Earnings)            ===== -->
+            <!-- =====     創作者收益頁 (Earnings)        ===== -->
             <!-- ================================================== -->
             <div id="earnings-screen" class="page">
                  <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">創作者收益</h1></header>
                  <div class="overflow-y-auto flex-1">
                      <main class="p-6">
-                        <div class="bg-white p-5 rounded-xl shadow-lg text-center">
-                            <p class="text-sm text-gray-500">目前總收益</p>
-                            <p class="text-4xl font-bold text-gray-800 my-2">NT$ 850</p>
-                            <button class="bg-green-500 text-white font-bold py-2 px-8 rounded-full">提領</button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 mt-6">
-                            <div class="bg-white p-3 rounded-xl shadow"><p class="text-xs text-gray-500">今日預估收益</p><p class="font-bold text-lg">NT$ 15</p></div>
-                            <div class="bg-white p-3 rounded-xl shadow"><p class="text-xs text-gray-500">本月累計</p><p class="font-bold text-lg">NT$ 320</p></div>
-                        </div>
-                        <div class="mt-8">
-                            <h3 class="font-bold mb-2">收益趨勢 (近30日)</h3>
-                            <div class="bg-white p-4 rounded-xl shadow">
-                                <img src="https://placehold.co/600x200/f0f9ff/0284c7?text=收益趨勢圖" alt="收益趨勢圖" class="w-full">
-                            </div>
-                        </div>
+                         <div class="bg-white p-5 rounded-xl shadow-lg text-center">
+                             <p class="text-sm text-gray-500">目前總收益</p>
+                             <p class="text-4xl font-bold text-gray-800 my-2">NT$ 850</p>
+                             <button class="bg-green-500 text-white font-bold py-2 px-8 rounded-full">提領</button>
+                         </div>
+                         <div class="grid grid-cols-2 gap-4 mt-6">
+                             <div class="bg-white p-3 rounded-xl shadow"><p class="text-xs text-gray-500">今日預估收益</p><p class="font-bold text-lg">NT$ 15</p></div>
+                             <div class="bg-white p-3 rounded-xl shadow"><p class="text-xs text-gray-500">本月累計</p><p class="font-bold text-lg">NT$ 320</p></div>
+                         </div>
                          <div class="mt-8">
-                            <h3 class="font-bold mb-2">熱門日記排行榜</h3>
-                            <div class="space-y-3">
-                                <div class="bg-white p-3 rounded-xl shadow flex items-center space-x-3">
-                                    <img src="https://placehold.co/100x100/34D399/FFFFFF?text=親子" class="w-16 h-16 rounded-lg object-cover">
-                                    <div class="flex-1"><p class="font-bold text-sm">陽明山繡球花之旅</p><p class="text-xs text-gray-500">觀看 8.2k次・收益 NT$ 125</p></div>
-                                </div>
+                             <h3 class="font-bold mb-2">收益趨勢 (近30日)</h3>
+                             <div class="bg-white p-4 rounded-xl shadow">
+                                 <img src="https://placehold.co/600x200/f0f9ff/0284c7?text=收益趨勢圖" alt="收益趨勢圖" class="w-full">
+                             </div>
+                         </div>
+                          <div class="mt-8">
+                             <h3 class="font-bold mb-2">熱門日記排行榜</h3>
+                             <div class="space-y-3">
                                  <div class="bg-white p-3 rounded-xl shadow flex items-center space-x-3">
-                                    <img src="https://placehold.co/100x100/fb923c/ffffff?text=露營" class="w-16 h-16 rounded-lg object-cover">
-                                    <div class="flex-1"><p class="font-bold text-sm">我們的第一次森林露營</p><p class="text-xs text-gray-500">觀看 6.5k次・收益 NT$ 98</p></div>
-                                </div>
-                            </div>
-                        </div>
+                                     <img src="https://placehold.co/100x100/34D399/FFFFFF?text=親子" class="w-16 h-16 rounded-lg object-cover">
+                                     <div class="flex-1"><p class="font-bold text-sm">陽明山繡球花之旅</p><p class="text-xs text-gray-500">觀看 8.2k次・收益 NT$ 125</p></div>
+                                 </div>
+                                  <div class="bg-white p-3 rounded-xl shadow flex items-center space-x-3">
+                                     <img src="https://placehold.co/100x100/fb923c/ffffff?text=露營" class="w-16 h-16 rounded-lg object-cover">
+                                     <div class="flex-1"><p class="font-bold text-sm">我們的第一次森林露營</p><p class="text-xs text-gray-500">觀看 6.5k次・收益 NT$ 98</p></div>
+                                 </div>
+                             </div>
+                         </div>
                      </main>
                  </div>
             </div>
             
             <!-- ================================================== -->
-            <!-- =====         管理群組頁 (Groups)              ===== -->
+            <!-- =====      管理群組頁 (Groups)          ===== -->
             <!-- ================================================== -->
             <div id="groups-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">管理我的群組</h1></header>
@@ -594,7 +623,7 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====       編輯群組頁 (Group Edit)            ===== -->
+            <!-- =====     編輯群組頁 (Group Edit)        ===== -->
             <!-- ================================================== -->
             <div id="group-edit-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">編輯群組</h1><button class="text-amber-500 font-bold w-12">儲存</button></header>
@@ -607,14 +636,14 @@
                         <div class="mt-6">
                              <h3 class="text-lg font-semibold text-gray-700 mb-2">成員 (5)</h3>
                              <div class="space-y-2">
-                                <div class="bg-white p-3 rounded-lg border flex justify-between items-center">
-                                    <div class="flex items-center"><img src="https://placehold.co/100x100/fde68a/a16207?text=嬤" class="w-10 h-10 rounded-full mr-3"><span>阿嬤</span></div>
-                                    <button class="text-red-500">移除</button>
-                                </div>
-                                <div class="bg-white p-3 rounded-lg border flex justify-between items-center">
-                                    <div class="flex items-center"><img src="https://placehold.co/100x100/dbeafe/1e3a8a?text=爸" class="w-10 h-10 rounded-full mr-3"><span>爸爸</span></div>
-                                    <button class="text-red-500">移除</button>
-                                </div>
+                                 <div class="bg-white p-3 rounded-lg border flex justify-between items-center">
+                                     <div class="flex items-center"><img src="https://placehold.co/100x100/fde68a/a16207?text=嬤" class="w-10 h-10 rounded-full mr-3"><span>阿嬤</span></div>
+                                     <button class="text-red-500">移除</button>
+                                 </div>
+                                 <div class="bg-white p-3 rounded-lg border flex justify-between items-center">
+                                     <div class="flex items-center"><img src="https://placehold.co/100x100/dbeafe/1e3a8a?text=爸" class="w-10 h-10 rounded-full mr-3"><span>爸爸</span></div>
+                                     <button class="text-red-500">移除</button>
+                                 </div>
                              </div>
                         </div>
                         <button id="add-member-button" class="mt-6 w-full bg-blue-500 text-white font-bold py-3 rounded-lg">＋ 新增成員</button>
@@ -624,26 +653,26 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====     建立新群組頁 (Group Create)          ===== -->
+            <!-- =====   建立新群組頁 (Group Create)      ===== -->
             <!-- ================================================== -->
             <div id="group-create-screen" class="page">
                  <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">建立新群組</h1><button class="text-amber-500 font-bold w-12">建立</button></header>
                  <div class="overflow-y-auto flex-1">
                      <main class="p-6">
-                        <div class="flex flex-col items-center">
-                            <button id="emoji-picker-button" class="text-6xl bg-white rounded-full h-24 w-24 flex items-center justify-center shadow-md mb-4">🍽️</button>
-                            <input type="text" placeholder="請輸入群組名稱" class="w-full text-center text-xl font-bold p-2 border-b-2 focus:outline-none focus:border-amber-500">
-                        </div>
-                        <div class="mt-8">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-2">新增成員</h3>
-                            <div class="relative"><input type="text" placeholder="搜尋使用者名稱..." class="w-full bg-white border border-gray-200 rounded-full py-2 pl-10 pr-4"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div></div>
-                        </div>
+                         <div class="flex flex-col items-center">
+                             <button id="emoji-picker-button" class="text-6xl bg-white rounded-full h-24 w-24 flex items-center justify-center shadow-md mb-4">🍽️</button>
+                             <input type="text" placeholder="請輸入群組名稱" class="w-full text-center text-xl font-bold p-2 border-b-2 focus:outline-none focus:border-amber-500">
+                         </div>
+                         <div class="mt-8">
+                             <h3 class="text-lg font-semibold text-gray-700 mb-2">新增成員</h3>
+                             <div class="relative"><input type="text" placeholder="搜尋使用者名稱..." class="w-full bg-white border border-gray-200 rounded-full py-2 pl-10 pr-4"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div></div>
+                         </div>
                      </main>
                  </div>
             </div>
 
              <!-- ================================================== -->
-            <!-- =====       編輯個人資料頁 (Profile Edit)      ===== -->
+            <!-- =====    編輯個人資料頁 (Profile Edit)     ===== -->
             <!-- ================================================== -->
             <div id="profile-edit-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">編輯個人資料</h1><button class="text-amber-500 font-bold w-12">儲存</button></header>
@@ -652,7 +681,7 @@
                         <div class="flex flex-col items-center">
                             <div class="relative">
                                 <img class="w-24 h-24 rounded-full" src="https://placehold.co/100x100/fde68a/a16207?text=林" alt="User Avatar">
-                                <button class="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border shadow"><svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
+                                <button class="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border shadow"><svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 011.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
                             </div>
                         </div>
                         <div class="mt-8 space-y-4">
@@ -667,7 +696,7 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====        AI 寫作風格頁 (Writing Style)       ===== -->
+            <!-- =====    AI 寫作風格頁 (Writing Style)     ===== -->
             <!-- ================================================== -->
             <div id="writing-style-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">AI 寫作風格</h1></header>
@@ -678,11 +707,11 @@
                             <label class="flex items-start p-4 bg-white border rounded-lg"><input type="radio" name="writing-style-option" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3"><p class="font-semibold">活潑有趣風</p><p class="text-sm text-gray-500">用字俏皮，多用驚嘆號，適合記錄歡樂的出遊。</p></div></label>
                             <label class="flex items-start p-4 bg-white border rounded-lg"><input type="radio" name="writing-style-option" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3"><p class="font-semibold">簡潔紀錄風</p><p class="text-sm text-gray-500">像旅遊雜誌般，客觀記錄時間、地點與事件。</p></div></label>
                              <label class="flex items-start p-4 bg-white border rounded-lg">
-                                <input type="radio" name="writing-style-option" value="custom" class="mt-1 text-amber-500 focus:ring-amber-400">
-                                <div class="ml-3 flex-1">
-                                    <p class="font-semibold">✍️ 自訂風格</p>
-                                    <textarea id="custom-prompt-style" class="w-full mt-2 p-2 border rounded text-sm bg-gray-50" rows="3" placeholder="請輸入您希望的寫作風格提示詞，例如：請用古龍的武俠小說風格來寫..." disabled></textarea>
-                                </div>
+                                 <input type="radio" name="writing-style-option" value="custom" class="mt-1 text-amber-500 focus:ring-amber-400">
+                                 <div class="ml-3 flex-1">
+                                     <p class="font-semibold">✍️ 自訂風格</p>
+                                     <textarea id="custom-prompt-style" class="w-full mt-2 p-2 border rounded text-sm bg-gray-50" rows="3" placeholder="請輸入您希望的寫作風格提示詞，例如：請用古龍的武俠小說風格來寫..." disabled></textarea>
+                                 </div>
                             </label>
                         </div>
                     </main>
@@ -690,7 +719,7 @@
             </div>
 
             <!-- ================================================== -->
-            <!-- =====     互動式提問頁 (Interactive Question)    ===== -->
+            <!-- =====   互動式提問頁 (Interactive Question)  ===== -->
             <!-- ================================================== -->
             <div id="interactive-question-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex justify-end items-center flex-shrink-0"><button id="skip-question-button" class="text-gray-500 hover:text-gray-800">跳過</button></header>
@@ -762,12 +791,12 @@
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyAoVd0MJy5TjwuEF8xPntGmyu3tpHEUuts",
-          authDomain: "family-time-capsule-ac438.firebaseapp.com",
-          projectId: "family-time-capsule-ac438",
-          storageBucket: "family-time-capsule-ac438.appspot.com",
-          messagingSenderId: "717537356458",
-          appId: "1:717537356458:web:59caf3c60cd45d2529bed3"
+            apiKey: "AIzaSyAoVd0MJy5TjwuEF8xPntGmyu3tpHEUuts",
+            authDomain: "family-time-capsule-ac438.firebaseapp.com",
+            projectId: "family-time-capsule-ac438",
+            storageBucket: "family-time-capsule-ac438.firebasestorage.app",
+            messagingSenderId: "717537356458",
+            appId: "1:717537356458:web:59caf3c60cd45d2529bed3"
         };
         
         // Initialize Firebase
@@ -788,14 +817,13 @@
         
         let navigationStack = ['auth-screen']; // Start with auth screen
         let diariesUnsubscribe = null; // To hold the listener unsubscribe function
-        let selectedFiles = []; // To store selected files temporarily
+        let selectedFiles = []; // To store selected files globally
 
         function showPage(targetId, isSubPage = false) {
             pages.forEach(page => {
                 page.classList.toggle('is-active', page.id === targetId);
             });
             
-            // Hide bottom nav on auth screen and sub-pages
             const showNav = !isSubPage && targetId !== 'auth-screen';
             bottomNav.style.display = showNav ? 'flex' : 'none';
         }
@@ -820,7 +848,6 @@
             }
         }
         
-        // --- Show Diary Detail ---
         function showDiaryDetail(diary) {
             document.getElementById('detail-title').textContent = diary.title;
             const detailContainer = document.getElementById('detail-content-container');
@@ -853,9 +880,8 @@
             navigateTo('detail-screen');
         }
 
-        // --- Render Diaries ---
         function renderDiaries(diaries) {
-            diariesContainer.innerHTML = ''; // Clear existing diaries
+            diariesContainer.innerHTML = ''; 
             
             if (diaries.length === 0) {
                 diariesContainer.innerHTML = `
@@ -892,15 +918,12 @@
             });
         }
 
-
-        // --- Auth State Listener ---
         onAuthStateChanged(auth, user => {
             if (diariesUnsubscribe) {
-                diariesUnsubscribe(); // Unsubscribe from previous listener
+                diariesUnsubscribe();
             }
 
             if (user) {
-                // User is signed in
                 console.log("User is signed in:", user);
                 if (user.isAnonymous) {
                     greeting.textContent = "下午好，訪客！";
@@ -909,7 +932,6 @@
                     greeting.textContent = `下午好，${name}！`;
                 }
 
-                // Listen for diaries
                 const q = query(collection(db, "diaries"), where("authorId", "==", user.uid));
                 diariesUnsubscribe = onSnapshot(q, (querySnapshot) => {
                     const diaries = [];
@@ -917,7 +939,6 @@
                         diaries.push({ id: doc.id, ...doc.data() });
                     });
                     
-                    // Sort diaries by createdAt timestamp in descending order on the client-side
                     diaries.sort((a, b) => {
                         const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
                         const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
@@ -943,16 +964,13 @@
                 }
 
             } else {
-                // User is signed out
                 console.log("User is signed out.");
-                renderDiaries([]); // Clear diaries on logout
+                renderDiaries([]);
                 navigationStack = ['auth-screen'];
                 navigateTo('auth-screen');
             }
         });
 
-
-        // --- Auth UI Logic ---
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const loginButton = document.getElementById('login-button');
@@ -1013,8 +1031,6 @@
             }
         });
 
-
-        // --- Original Prototype Logic (with modifications) ---
         navItems.forEach(item => {
             item.addEventListener('click', () => {
                 const targetId = item.dataset.target;
@@ -1032,19 +1048,16 @@
             } else if (user) {
                 navigateTo('create-screen');
             } else {
-                // Should not happen due to onAuthStateChanged, but as a fallback
                 navigateTo('auth-screen');
             }
         });
         
-        // Static cards on other pages
         document.querySelectorAll('#explore-screen .masonry-item, #profile-screen .masonry-item').forEach(card => card.addEventListener('click', () => navigateTo('detail-screen')));
         document.querySelectorAll('#explore-screen .creator-card').forEach(card => card.addEventListener('click', () => navigateTo('profile-screen')));
         
         document.getElementById('settings-button').addEventListener('click', () => navigateTo('pro-screen'));
         document.querySelectorAll('.go-back-button').forEach(button => button.addEventListener('click', goBack));
         
-        // --- Settings/Pro Page ---
         document.getElementById('go-to-earnings').addEventListener('click', () => navigateTo('earnings-screen'));
         document.getElementById('go-to-groups').addEventListener('click', () => navigateTo('groups-screen'));
         document.querySelectorAll('#groups-screen .group-item').forEach(item => item.addEventListener('click', () => navigateTo('group-edit-screen')));
@@ -1052,32 +1065,73 @@
         document.getElementById('go-to-profile-edit').addEventListener('click', () => navigateTo('profile-edit-screen'));
         document.getElementById('go-to-writing-style').addEventListener('click', () => navigateTo('writing-style-screen'));
 
-
-        // --- Create Diary Page ---
         const titleInput = document.getElementById('diary-title');
         const saveDiaryButton = document.getElementById('save-diary-button');
         const photoUpload = document.getElementById('photo-upload');
-        const photoCarouselContainer = document.getElementById('photo-carousel-container');
+        // UPDATED: Renamed variable for clarity
+        const photoGridContainer = document.getElementById('photo-grid-container');
         const photoCountSpan = document.getElementById('photo-count');
 
+        // UPDATED: Function to render photo previews in a grid
+        function renderPhotoPreviews() {
+            photoGridContainer.innerHTML = ''; // Clear existing content
+
+            // Render each selected file
+            selectedFiles.forEach((file, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'relative aspect-square'; // Use aspect-square for consistent size
+
+                const img = document.createElement('img');
+                img.className = "rounded-lg w-full h-full object-cover"; // Fill the wrapper
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'absolute top-2 right-2 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center text-sm font-bold leading-none hover:bg-black/80 transition-colors z-10';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.title = "移除這張照片";
+                removeBtn.dataset.index = index;
+
+                const orderBadge = document.createElement('div');
+                orderBadge.className = 'absolute top-2 left-2 w-6 h-6 bg-black/60 text-white rounded-full flex items-center justify-center text-sm font-bold z-10';
+                orderBadge.textContent = index + 1;
+
+                removeBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const indexToRemove = parseInt(event.currentTarget.dataset.index, 10);
+                    selectedFiles.splice(indexToRemove, 1);
+                    renderPhotoPreviews();
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                wrapper.appendChild(orderBadge);
+                photoGridContainer.appendChild(wrapper);
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            });
+
+            // Create and append the "add photo" button at the end
+            const addPhotoLabel = document.createElement('label');
+            addPhotoLabel.htmlFor = 'photo-upload';
+            addPhotoLabel.className = "aspect-square bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors";
+            addPhotoLabel.innerHTML = `
+                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <span class="mt-2 text-sm text-gray-500">新增照片</span>
+            `;
+            photoGridContainer.appendChild(addPhotoLabel);
+
+            photoCountSpan.textContent = `已選取的照片 (${selectedFiles.length})`;
+        }
 
         if(photoUpload) {
             photoUpload.addEventListener('change', (event) => {
-                selectedFiles = Array.from(event.target.files); // Store files in the global variable
-                if (selectedFiles.length > 0) {
-                    photoCarouselContainer.innerHTML = ''; // Clear placeholder
-                }
-                for (const file of selectedFiles) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = "rounded-lg h-40 object-cover flex-shrink-0";
-                        photoCarouselContainer.appendChild(img);
-                    }
-                    reader.readAsDataURL(file);
-                }
-                photoCountSpan.textContent = `已選取的照片 (${selectedFiles.length})`;
+                const newFiles = Array.from(event.target.files);
+                selectedFiles.push(...newFiles);
+                renderPhotoPreviews();
+                event.target.value = '';
             });
         }
 
@@ -1090,19 +1144,12 @@
         
         function resetCreateForm() {
             titleInput.value = '';
-            photoUpload.value = ''; // Clear the file input
+            photoUpload.value = '';
             selectedFiles = [];
-            photoCarouselContainer.innerHTML = `
-                <label for="photo-upload" class="w-full h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer">
-                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <span class="mt-2 text-sm text-gray-500">點擊此處上傳照片</span>
-                </label>
-            `;
-            photoCountSpan.textContent = `已選取的照片 (0)`;
+            renderPhotoPreviews();
             saveDiaryButton.disabled = true;
         }
 
-        // --- Helper function to convert a File to a Gemini API part ---
         async function fileToGenerativePart(file) {
             const base64EncodedDataPromise = new Promise((resolve) => {
                 const reader = new FileReader();
@@ -1114,8 +1161,6 @@
             };
         }
 
-
-        // --- Save Diary Logic ---
         saveDiaryButton.dataset.originalText = saveDiaryButton.innerHTML;
         saveDiaryButton.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -1142,7 +1187,6 @@
             const styleText = styleMapping[styleValue] || '溫馨感性風';
             
             try {
-                // --- Step 1: Compress and Upload Photos to Firebase Storage ---
                 const uploadedPhotoURLs = [];
                 if (selectedFiles.length > 0) {
                     const uploadPromises = selectedFiles.map(async (file) => {
@@ -1163,7 +1207,6 @@
                     uploadedPhotoURLs.push(...await Promise.all(uploadPromises));
                 }
 
-                // --- Step 2: Prepare data for Gemini API ---
                 const textPrompt = `請根據我提供的照片，並參考標題「${title}」，用${styleText}寫一篇約150字的日記短文。`;
                 const imageParts = await Promise.all(selectedFiles.map(fileToGenerativePart));
                 
@@ -1173,7 +1216,6 @@
                 const apiKey = ""; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 
-                // --- Step 3: Call Gemini API ---
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1187,12 +1229,10 @@
                 const result = await response.json();
                 const generatedText = result.candidates[0].content.parts[0].text;
                 
-                // Simple parsing for intro and content
                 const sentences = generatedText.split(/[。\n]/).filter(s => s.trim() !== '');
                 const intro = sentences.slice(0, 2).join('。') + '。';
                 const content = generatedText;
 
-                // --- Step 4: Save to Firestore ---
                 const diaryData = {
                     title: title,
                     privacy: privacy,
@@ -1200,13 +1240,12 @@
                     createdAt: serverTimestamp(),
                     content: content,
                     intro: intro,
-                    photoURLs: uploadedPhotoURLs // Save photo URLs
+                    photoURLs: uploadedPhotoURLs
                 };
                 
                 const docRef = await addDoc(collection(db, "diaries"), diaryData);
                 console.log("日記已儲存，ID: ", docRef.id);
                 
-                // Navigate to home after successful save
                 resetCreateForm();
                 navigationStack = ['home-screen']; 
                 navigateTo('home-screen');
@@ -1219,7 +1258,6 @@
             }
         });
         
-        // --- Interactive Question Page (currently skipped by save logic) ---
         const skipQuestionButton = document.getElementById('skip-question-button');
         const continueGenerationButton = document.getElementById('continue-generation-button');
         
@@ -1227,8 +1265,8 @@
             document.getElementById('detail-title').textContent = titleInput.value;
             navigateTo('loading-screen');
             setTimeout(() => {
-                navigationStack.pop(); // remove question page
-                navigationStack.pop(); // remove create page
+                navigationStack.pop(); 
+                navigationStack.pop(); 
                 navigateTo('detail-screen');
             }, 2500);
         }
@@ -1236,8 +1274,6 @@
         if(skipQuestionButton) skipQuestionButton.addEventListener('click', proceedToGeneration);
         if(continueGenerationButton) continueGenerationButton.addEventListener('click', proceedToGeneration);
 
-
-        // --- Detail Page ---
         const editButton = document.getElementById('edit-button');
         if(editButton) {
             editButton.addEventListener('click', () => {
@@ -1252,7 +1288,6 @@
             })
         });
 
-        // --- Edit Page ---
         const saveButton = document.getElementById('save-button');
         if(saveButton) {
             saveButton.addEventListener('click', () => {
@@ -1262,7 +1297,6 @@
             });
         }
 
-        // --- Share Modal Logic ---
         const shareButton = document.getElementById('share-button');
         const modalContainer = document.getElementById('share-modal-container');
         if (shareButton) {
@@ -1291,14 +1325,13 @@
             });
         }
         
-        // --- Add Member Modal Logic ---
         const addMemberButton = document.getElementById('add-member-button');
         const addMemberModalContainer = document.getElementById('add-member-modal-container');
         const inviteLinkDetails = document.getElementById('invite-link-details');
 
         if (addMemberButton) {
             addMemberButton.addEventListener('click', () => {
-                inviteLinkDetails.classList.add('hidden'); // Reset state
+                inviteLinkDetails.classList.add('hidden');
                 addMemberModalContainer.classList.add('visible');
             });
         }
@@ -1340,7 +1373,6 @@
             });
         }
 
-        // --- Emoji Picker Logic ---
         const emojiPickerButton = document.getElementById('emoji-picker-button');
         if (emojiPickerButton) {
             const emojis = ['🍽️', '🏕️', '🎂', '🏖️', '✈️', '🎉', '🏠'];
@@ -1351,7 +1383,6 @@
             });
         }
 
-        // --- Writing Style Logic ---
         const customPromptTextarea = document.getElementById('custom-prompt-style');
         if(customPromptTextarea) {
             document.querySelectorAll('input[name="writing-style-option"]').forEach(radio => {
@@ -1367,30 +1398,26 @@
             });
         }
 
-        // --- Explore Page Tab Logic ---
         const exploreTabs = document.querySelectorAll('.explore-tab');
         const tabContents = document.querySelectorAll('#explore-screen .tab-content');
 
         exploreTabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                // Deactivate all tabs and content
                 exploreTabs.forEach(t => t.classList.remove('active'));
                 tabContents.forEach(c => c.classList.add('hidden'));
 
-                // Activate clicked tab and its content
                 tab.classList.add('active');
                 const contentId = tab.dataset.tab + '-content';
                 document.getElementById(contentId).classList.remove('hidden');
             });
         });
 
-        // --- Guest Modal Logic ---
         document.getElementById('close-guest-modal-button').addEventListener('click', () => {
             guestModal.classList.remove('visible');
         });
         document.getElementById('go-to-auth-button').addEventListener('click', async () => {
             guestModal.classList.remove('visible');
-            await signOut(auth); // Log out from anonymous session
+            await signOut(auth);
             navigateTo('auth-screen');
         });
 
