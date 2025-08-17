@@ -429,52 +429,50 @@
             <!-- =====      建立新日記頁 (Create)         ===== -->
             <!-- ================================================== -->
             <div id="create-screen" class="page">
-                <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex justify-between items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900">取消</button><h1 class="text-base font-bold text-gray-800">建立新的回憶</h1></header>
+                <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex justify-between items-center flex-shrink-0">
+                    <button class="go-back-button text-gray-600 hover:text-gray-900">取消</button>
+                    <h1 class="text-base font-bold text-gray-800">建立新的回憶</h1>
+                    <div class="w-12"></div> <!-- Placeholder for alignment -->
+                </header>
                 <div class="overflow-y-auto flex-1">
-                    <main class="p-5">
+                    <main class="p-5 pb-24">
                         <h2 class="text-lg font-semibold text-gray-700 mb-3">
                             <span id="photo-count">已選取的照片 (0)</span>
                         </h2>
-                        <!-- MODIFIED: Changed from flexbox carousel to grid -->
                         <div id="photo-grid-container" class="grid grid-cols-2 gap-4">
-                            <!-- Photos will be dynamically inserted here by JS -->
                             <label for="photo-upload" class="aspect-square bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
                                 <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                                 <span class="mt-2 text-sm text-gray-500">新增照片</span>
                             </label>
                         </div>
                         <input type="file" id="photo-upload" multiple accept="image/*" class="hidden">
-                        <div class="mt-6 relative">
-                            <label for="diary-title" class="text-lg font-semibold text-gray-700">日記標題</label>
-                            <div class="flex items-center">
-                                <input type="text" id="diary-title" placeholder="為這份回憶取個名字吧！" class="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400">
-                                <button id="ai-title-button" class="ml-2 mt-2 p-3 bg-amber-200 text-amber-800 rounded-lg hover:bg-amber-300 transition-colors">✨</button>
+                        
+                        <div class="mt-6">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">誰可以看見？</h3>
+                            <select id="privacy-select" class="w-full p-3 border border-gray-300 rounded-lg bg-white">
+                                <option value="private">🔒 僅限自己</option>
+                                <option value="group">👨‍👩‍👧‍👦 特定群組</option>
+                                <option value="public">🌐 公開到社群</option>
+                            </select>
+                        </div>
+                        <div class="mt-6">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">AI 寫作風格</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-start p-3 bg-white border-2 border-amber-400 rounded-lg"><input type="radio" name="writing-style" value="warm" class="mt-1 text-amber-500 focus:ring-amber-400" checked><div class="ml-3"><p class="font-semibold">溫馨感性風</p></div></label>
+                                <label class="flex items-start p-3 bg-white border rounded-lg"><input type="radio" name="writing-style" value="fun" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3"><p class="font-semibold">活潑有趣風</p></div></label>
+                                <label class="flex items-start p-3 bg-white border rounded-lg"><input type="radio" name="writing-style" value="simple" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3"><p class="font-semibold">簡潔紀錄風</p></div></label>
+                                <div class="p-3 bg-white border rounded-lg">
+                                    <label class="flex items-start"><input type="radio" name="writing-style" value="custom" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3 flex-1"><p class="font-semibold">✍️ 自訂風格</p><textarea id="custom-prompt" class="w-full mt-2 p-2 border rounded text-sm bg-gray-50" rows="3" placeholder="請輸入您希望的寫作風格提示詞，例如：請用古龍的武俠小說風格來寫..." disabled></textarea></div></label>
+                                </div>
                             </div>
                         </div>
-                    <div class="mt-6">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">誰可以看見？</h3>
-                        <select id="privacy-select" class="w-full p-3 border border-gray-300 rounded-lg bg-white">
-                            <option value="private">🔒 僅限自己</option>
-                            <option value="group">👨‍👩‍👧‍👦 特定群組</option>
-                            <option value="public">🌐 公開到社群</option>
-                        </select>
-                    </div>
-                       <div class="mt-6">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">AI 寫作風格</h3>
-                        <div class="space-y-2">
-                            <label class="flex items-start p-3 bg-white border-2 border-amber-400 rounded-lg"><input type="radio" name="writing-style" value="warm" class="mt-1 text-amber-500 focus:ring-amber-400" checked><div class="ml-3"><p class="font-semibold">溫馨感性風</p></div></label>
-                            <label class="flex items-start p-3 bg-white border rounded-lg"><input type="radio" name="writing-style" value="fun" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3"><p class="font-semibold">活潑有趣風</p></div></label>
-                            <label class="flex items-start p-3 bg-white border rounded-lg"><input type="radio" name="writing-style" value="simple" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3"><p class="font-semibold">簡潔紀錄風</p></div></label>
-                            <div class="p-3 bg-white border rounded-lg">
-                                <label class="flex items-start"><input type="radio" name="writing-style" value="custom" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3 flex-1"><p class="font-semibold">✍️ 自訂風格</p><textarea id="custom-prompt" class="w-full mt-2 p-2 border rounded text-sm bg-gray-50" rows="3" placeholder="請輸入您希望的寫作風格提示詞，例如：請用古龍的武俠小說風格來寫..." disabled></textarea></div></label>
-                            </div>
-                        </div>
-                    </div>
+                        <div id="create-error" class="text-red-500 text-xs italic mt-4 h-4 text-center"></div>
                     </main>
                 </div>
                 <footer class="p-5 bg-white/80 backdrop-blur-sm border-t border-gray-200 flex-shrink-0">
-                    <div id="create-error" class="text-red-500 text-xs italic mb-2 h-4 text-center"></div>
-                    <button id="save-diary-button" class="w-full bg-amber-500 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-amber-600 transition-all disabled:bg-gray-300 disabled:shadow-none" disabled>下一步</button>
+                    <button id="generate-diary-button" class="w-full bg-amber-500 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-amber-600 transition-all disabled:bg-gray-300 disabled:shadow-none flex items-center justify-center" disabled>
+                        ✨ AI 自動生成日記
+                    </button>
                 </footer>
             </div>
 
@@ -556,7 +554,7 @@
                             <span>&gt;</span>
                         </button>
                         <div class="mt-8 space-y-2">
-                             <button id="go-to-earnings" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>� 創作者收益中心</span><span>&gt;</span></button>
+                             <button id="go-to-earnings" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>💰 創作者收益中心</span><span>&gt;</span></button>
                              <button id="go-to-groups" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>👨‍👩‍👧‍👦 管理我的群組</span><span>&gt;</span></button>
                              <button id="go-to-writing-style" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>✍️ AI 寫作風格</span><span>&gt;</span></button>
                              <button class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>🔔 通知設定</span><span>&gt;</span></button>
@@ -848,6 +846,7 @@
             }
         }
         
+        // MODIFIED: Updated the layout for the diary detail page
         function showDiaryDetail(diary) {
             document.getElementById('detail-title').textContent = diary.title;
             const detailContainer = document.getElementById('detail-content-container');
@@ -858,27 +857,29 @@
 
             let imagesHTML = '';
             if (diary.photoURLs && diary.photoURLs.length > 1) {
-                imagesHTML = diary.photoURLs.slice(1).map(url => `
-                    <div class="my-4">
-                        <img src="${url}" alt="日記照片" class="w-full rounded-lg shadow-lg">
+                // Create a grid for the rest of the images
+                imagesHTML = `<div class="grid grid-cols-2 gap-4 mt-6">` +
+                diary.photoURLs.slice(1).map(url => `
+                    <div>
+                        <img src="${url}" alt="日記照片" class="w-full h-full object-cover rounded-lg shadow-lg">
                     </div>
-                `).join('');
+                `).join('') + `</div>`;
             }
 
             detailContainer.innerHTML = `
-                <div class="relative">
-                    <img src="${coverImage}" alt="日記封面" class="w-full h-64 object-contain bg-gray-200">
-                    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
-                        <p id="detail-intro-text" class="text-white text-lg leading-relaxed">${diary.intro || '...'}</p>
-                    </div>
+                <div>
+                    <img src="${coverImage}" alt="日記封面" class="w-full h-64 object-cover">
                 </div>
-                <div class="p-5 space-y-8">
-                    <p id="detail-body-text" class="text-gray-700 leading-relaxed">${diary.content || '...'}</p>
+                <div class="p-5 space-y-4">
+                    <p id="detail-intro-text" class="text-lg font-semibold text-gray-800 leading-relaxed">${diary.intro || '...'}</p>
+                    <hr class="border-gray-200">
+                    <p id="detail-body-text" class="text-gray-700 leading-relaxed whitespace-pre-wrap">${diary.content || '...'}</p>
                     ${imagesHTML}
                 </div>
             `;
             navigateTo('detail-screen');
         }
+
 
         function renderDiaries(diaries) {
             diariesContainer.innerHTML = ''; 
@@ -898,7 +899,7 @@
 
             diaries.forEach(diary => {
                 const date = diary.createdAt ? diary.createdAt.toDate().toLocaleDateString('zh-TW') : '未知日期';
-                const privacyIcon = diary.privacy === 'private' ? '🔒' : diary.privacy === 'group' ? '👨‍👩‍👧‍👦' : '🌐';
+                const privacyIcon = diary.privacy === 'private' ? '🔒' : diary.privacy === 'group' ? '👨‍👩‍👧‍👦' : '�';
                 const coverImage = (diary.photoURLs && diary.photoURLs.length > 0) 
                     ? diary.photoURLs[0] 
                     : `https://placehold.co/600x400/34D399/FFFFFF?text=${encodeURIComponent(diary.title)}`;
@@ -1065,24 +1066,21 @@
         document.getElementById('go-to-profile-edit').addEventListener('click', () => navigateTo('profile-edit-screen'));
         document.getElementById('go-to-writing-style').addEventListener('click', () => navigateTo('writing-style-screen'));
 
-        const titleInput = document.getElementById('diary-title');
-        const saveDiaryButton = document.getElementById('save-diary-button');
+        // --- Create Diary Page ---
+        const generateDiaryButton = document.getElementById('generate-diary-button');
         const photoUpload = document.getElementById('photo-upload');
-        // UPDATED: Renamed variable for clarity
         const photoGridContainer = document.getElementById('photo-grid-container');
         const photoCountSpan = document.getElementById('photo-count');
 
-        // UPDATED: Function to render photo previews in a grid
         function renderPhotoPreviews() {
-            photoGridContainer.innerHTML = ''; // Clear existing content
+            photoGridContainer.innerHTML = ''; 
 
-            // Render each selected file
             selectedFiles.forEach((file, index) => {
                 const wrapper = document.createElement('div');
-                wrapper.className = 'relative aspect-square'; // Use aspect-square for consistent size
+                wrapper.className = 'relative aspect-square';
 
                 const img = document.createElement('img');
-                img.className = "rounded-lg w-full h-full object-cover"; // Fill the wrapper
+                img.className = "rounded-lg w-full h-full object-cover";
 
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'absolute top-2 right-2 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center text-sm font-bold leading-none hover:bg-black/80 transition-colors z-10';
@@ -1113,7 +1111,6 @@
                 reader.readAsDataURL(file);
             });
 
-            // Create and append the "add photo" button at the end
             const addPhotoLabel = document.createElement('label');
             addPhotoLabel.htmlFor = 'photo-upload';
             addPhotoLabel.className = "aspect-square bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors";
@@ -1124,6 +1121,9 @@
             photoGridContainer.appendChild(addPhotoLabel);
 
             photoCountSpan.textContent = `已選取的照片 (${selectedFiles.length})`;
+            if (generateDiaryButton) {
+                generateDiaryButton.disabled = selectedFiles.length === 0;
+            }
         }
 
         if(photoUpload) {
@@ -1134,20 +1134,11 @@
                 event.target.value = '';
             });
         }
-
-        if(titleInput) {
-            titleInput.addEventListener('input', () => {
-                const hasText = titleInput.value.trim().length > 0;
-                saveDiaryButton.disabled = !hasText;
-            });
-        }
         
         function resetCreateForm() {
-            titleInput.value = '';
             photoUpload.value = '';
             selectedFiles = [];
             renderPhotoPreviews();
-            saveDiaryButton.disabled = true;
         }
 
         async function fileToGenerativePart(file) {
@@ -1160,21 +1151,20 @@
                 inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
             };
         }
-
-        saveDiaryButton.dataset.originalText = saveDiaryButton.innerHTML;
-        saveDiaryButton.addEventListener('click', async (e) => {
+        
+        generateDiaryButton.dataset.originalText = generateDiaryButton.innerHTML;
+        generateDiaryButton.addEventListener('click', async (e) => {
             e.preventDefault();
-            setButtonLoading(saveDiaryButton, true);
+            setButtonLoading(generateDiaryButton, true);
             createError.textContent = '';
             
             const user = auth.currentUser;
             if (!user) {
                 createError.textContent = "錯誤：您尚未登入。";
-                setButtonLoading(saveDiaryButton, false);
+                setButtonLoading(generateDiaryButton, false);
                 return;
             }
 
-            const title = document.getElementById('diary-title').value;
             const privacy = document.getElementById('privacy-select').value;
             const styleElement = document.querySelector('input[name="writing-style"]:checked');
             const styleValue = styleElement ? styleElement.value : 'warm';
@@ -1196,22 +1186,30 @@
                             useWebWorker: true
                         }
                         const compressedFile = await imageCompression(file, options);
-                        console.log(`Compressed ${file.name} from ${file.size/1024/1024} MB to ${compressedFile.size/1024/1024} MB`);
-
                         const filePath = `diaries/${user.uid}/${Date.now()}-${compressedFile.name}`;
                         const storageRef = ref(storage, filePath);
                         const snapshot = await uploadBytes(storageRef, compressedFile);
-                        const downloadURL = await getDownloadURL(snapshot.ref);
-                        return downloadURL;
+                        return await getDownloadURL(snapshot.ref);
                     });
                     uploadedPhotoURLs.push(...await Promise.all(uploadPromises));
                 }
 
-                const textPrompt = `請根據我提供的照片，並參考標題「${title}」，用${styleText}寫一篇約150字的日記短文。`;
+                const textPrompt = `請根據我提供的照片，用${styleText}生成一個適合的「標題」和一篇約150字的「日記內容」。`;
                 const imageParts = await Promise.all(selectedFiles.map(fileToGenerativePart));
                 
                 const payload = {
                     contents: [{ parts: [{ text: textPrompt }, ...imageParts] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "title": { "type": "STRING" },
+                                "content": { "type": "STRING" }
+                            },
+                            required: ["title", "content"]
+                        }
+                    }
                 };
                 const apiKey = ""; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
@@ -1227,18 +1225,17 @@
                 }
 
                 const result = await response.json();
-                const generatedText = result.candidates[0].content.parts[0].text;
+                const generatedData = JSON.parse(result.candidates[0].content.parts[0].text);
                 
-                const sentences = generatedText.split(/[。\n]/).filter(s => s.trim() !== '');
-                const intro = sentences.slice(0, 2).join('。') + '。';
-                const content = generatedText;
+                const sentences = generatedData.content.split(/[。\n]/).filter(s => s.trim() !== '');
+                const intro = sentences.length > 1 ? sentences.slice(0, 2).join('。') + '。' : generatedData.content;
 
                 const diaryData = {
-                    title: title,
+                    title: generatedData.title,
                     privacy: privacy,
                     authorId: user.uid,
                     createdAt: serverTimestamp(),
-                    content: content,
+                    content: generatedData.content,
                     intro: intro,
                     photoURLs: uploadedPhotoURLs
                 };
@@ -1254,7 +1251,7 @@
                 console.error("儲存日記時發生錯誤: ", error);
                 createError.textContent = "日記生成或儲存失敗，請稍後再試。";
             } finally {
-                setButtonLoading(saveDiaryButton, false);
+                setButtonLoading(generateDiaryButton, false);
             }
         });
         
@@ -1262,7 +1259,6 @@
         const continueGenerationButton = document.getElementById('continue-generation-button');
         
         function proceedToGeneration() {
-            document.getElementById('detail-title').textContent = titleInput.value;
             navigateTo('loading-screen');
             setTimeout(() => {
                 navigationStack.pop(); 
@@ -1424,3 +1420,4 @@
     </script>
 </body>
 </html>
+�
