@@ -846,7 +846,6 @@
             }
         }
         
-        // MODIFIED: Updated the layout for the diary detail page
         function showDiaryDetail(diary) {
             document.getElementById('detail-title').textContent = diary.title;
             const detailContainer = document.getElementById('detail-content-container');
@@ -857,7 +856,6 @@
 
             let imagesHTML = '';
             if (diary.photoURLs && diary.photoURLs.length > 1) {
-                // Create a grid for the rest of the images
                 imagesHTML = `<div class="grid grid-cols-2 gap-4 mt-6">` +
                 diary.photoURLs.slice(1).map(url => `
                     <div>
@@ -899,7 +897,7 @@
 
             diaries.forEach(diary => {
                 const date = diary.createdAt ? diary.createdAt.toDate().toLocaleDateString('zh-TW') : '未知日期';
-                const privacyIcon = diary.privacy === 'private' ? '🔒' : diary.privacy === 'group' ? '👨‍👩‍👧‍👦' : '�';
+                const privacyIcon = diary.privacy === 'private' ? '🔒' : diary.privacy === 'group' ? '👨‍👩‍👧‍👦' : '🌐';
                 const coverImage = (diary.photoURLs && diary.photoURLs.length > 0) 
                     ? diary.photoURLs[0] 
                     : `https://placehold.co/600x400/34D399/FFFFFF?text=${encodeURIComponent(diary.title)}`;
@@ -1083,13 +1081,15 @@
                 img.className = "rounded-lg w-full h-full object-cover";
 
                 const removeBtn = document.createElement('button');
-                removeBtn.className = 'absolute top-2 right-2 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center text-sm font-bold leading-none hover:bg-black/80 transition-colors z-10';
+                // MODIFIED: Changed button colors
+                removeBtn.className = 'absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-sm font-bold leading-none hover:bg-red-600 transition-colors z-10';
                 removeBtn.innerHTML = '&times;';
                 removeBtn.title = "移除這張照片";
                 removeBtn.dataset.index = index;
 
                 const orderBadge = document.createElement('div');
-                orderBadge.className = 'absolute top-2 left-2 w-6 h-6 bg-black/60 text-white rounded-full flex items-center justify-center text-sm font-bold z-10';
+                // MODIFIED: Changed badge colors
+                orderBadge.className = 'absolute top-2 left-2 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold z-10';
                 orderBadge.textContent = index + 1;
 
                 removeBtn.addEventListener('click', (event) => {
@@ -1420,4 +1420,3 @@
     </script>
 </body>
 </html>
-�
