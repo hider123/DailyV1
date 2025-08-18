@@ -513,7 +513,7 @@
                     </div>
                 </header>
                 <div class="overflow-y-auto flex-1">
-                    <main id="detail-content-container">
+                    <main id="detail-content-container" class="pb-6">
                         <!-- Diary content will be dynamically inserted here -->
                     </main>
                 </div>
@@ -636,7 +636,7 @@
                 <div class="overflow-y-auto flex-1">
                     <main class="p-6">
                         <div class="space-y-3">
-                            <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>👨‍👩‍👧‍� 家人群組</p><p class="text-xs text-gray-500">5 位成員</p></div><span>&gt;</span></button>
+                            <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>👨‍👩‍👧‍👦 家人群組</p><p class="text-xs text-gray-500">5 位成員</p></div><span>&gt;</span></button>
                             <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>🧑‍🤝‍🧑 朋友群組</p><p class="text-xs text-gray-500">12 位成員</p></div><span>&gt;</span></button>
                             <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>🏕️ 露營好夥伴</p><p class="text-xs text-gray-500">8 位成員</p></div><span>&gt;</span></button>
                         </div>
@@ -892,10 +892,15 @@
             // Check for the new data structure (with events)
             if (eventsArray && Array.isArray(eventsArray)) {
                 // RENDER NEW TIMELINE VIEW
-                const overallStoryHTML = `
+                const summaryHTML = `
                     <div class="p-5">
+                         <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg mb-4">
+                            <p class="font-bold text-amber-800">一句話亮點：</p>
+                            <p class="italic text-amber-700">“${diary.highlight_quote || '未提供'}”</p>
+                             <p class="font-bold text-amber-800 mt-2">最常出現的人物：</p>
+                            <p class="text-amber-700">${diary.main_character || '未提供'}</p>
+                        </div>
                         <h1 class="text-2xl font-bold text-gray-900">${diary.title}</h1>
-                        <p class="mt-2 text-base text-gray-700 leading-relaxed">${diary.overall_story || ''}</p>
                         <hr class="mt-4 border-gray-200">
                     </div>
                 `;
@@ -905,7 +910,7 @@
                     return `
                         <div class="timeline-item">
                              <div class="timeline-dot"></div>
-                             <div class="w-full bg-black rounded-lg overflow-hidden mb-4">
+                             <div class="w-full bg-black rounded-lg overflow-hidden mb-4 shadow-lg">
                                 <img src="${imageUrl}" alt="事件照片 ${index + 1}" class="w-full h-auto object-contain block" style="max-height: 70vh;">
                             </div>
                             <div class="flex items-center text-sm text-gray-500 space-x-4 mb-3">
@@ -917,7 +922,7 @@
                     `;
                 }).join('')}</div>`;
 
-                detailContainer.innerHTML = overallStoryHTML + eventsHTML;
+                detailContainer.innerHTML = summaryHTML + eventsHTML;
 
             } else {
                 // RENDER OLD (FALLBACK) VIEW for backward compatibility
@@ -1274,7 +1279,9 @@
                 const textPrompt = `請根據我提供的 ${selectedFiles.length} 張照片，用${styleText}風格，生成一個JSON物件。物件需包含：
 1. "title": 符合風格的故事標題。
 2. "overall_story": 將所有照片串連起來的總結性故事。
-3. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (照片1的時間，如果未知請推測), "location" (照片1的地點，如果未知請推測具體名稱), "description" (照片1的事件描述，100字內)。`;
+3. "highlight_quote": 總結這次活動的「一句話亮點」。
+4. "main_character": 辨識出照片中「最常出現的人物」。
+5. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (照片的時間，如果未知請推測), "location" (照片的地點，如果未知請推測具體名稱), "description" (照片的事件描述，100字內)。`;
                 
                 const imageParts = await Promise.all(selectedFiles.map(fileToGenerativePart));
                 
@@ -1287,6 +1294,8 @@
                             properties: {
                                 "title": { "type": "STRING" },
                                 "overall_story": { "type": "STRING" },
+                                "highlight_quote": { "type": "STRING" },
+                                "main_character": { "type": "STRING" },
                                 "events": {
                                     "type": "ARRAY",
                                     "items": {
@@ -1300,7 +1309,7 @@
                                     }
                                 }
                             },
-                            required: ["title", "overall_story", "events"]
+                            required: ["title", "overall_story", "highlight_quote", "main_character", "events"]
                         }
                     }
                 };
@@ -1328,7 +1337,8 @@
                 const diaryData = {
                     title: generatedData.title,
                     overall_story: generatedData.overall_story,
-                    // FIX: Stringify events array before saving to Firestore
+                    highlight_quote: generatedData.highlight_quote,
+                    main_character: generatedData.main_character,
                     events: JSON.stringify(generatedData.events),
                     privacy: privacy,
                     authorId: user.uid,
@@ -1570,4 +1580,3 @@
     </script>
 </body>
 </html>
-�
