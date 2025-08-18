@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Image Compression Library -->
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+    <!-- EXIF Data Reader Library -->
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
@@ -163,18 +165,6 @@
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-        
-        /* --- Timeline Styles --- */
-        .timeline-container::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: #e2e8f0; /* gray-200 */
         }
     </style>
 </head>
@@ -554,7 +544,7 @@
                             <span>&gt;</span>
                         </button>
                         <div class="mt-8 space-y-2">
-                             <button id="go-to-earnings" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>💰 創作者收益中心</span><span>&gt;</span></button>
+                             <button id="go-to-earnings" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>� 創作者收益中心</span><span>&gt;</span></button>
                              <button id="go-to-groups" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>👨‍👩‍👧‍👦 管理我的群組</span><span>&gt;</span></button>
                              <button id="go-to-writing-style" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>✍️ AI 寫作風格</span><span>&gt;</span></button>
                              <button class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>🔔 通知設定</span><span>&gt;</span></button>
@@ -847,34 +837,87 @@
         }
         
         function showDiaryDetail(diary) {
-            document.getElementById('detail-title').textContent = diary.title;
+            document.getElementById('detail-title').textContent = diary.title || '日記詳情';
             const detailContainer = document.getElementById('detail-content-container');
-            
-            const coverImage = (diary.photoURLs && diary.photoURLs.length > 0) 
-                ? diary.photoURLs[0] 
-                : `https://placehold.co/600x450/6EE7B7/1F2937?text=${encodeURIComponent(diary.title)}`;
+            detailContainer.innerHTML = ''; // Clear previous content
 
-            let imagesHTML = '';
-            if (diary.photoURLs && diary.photoURLs.length > 1) {
-                imagesHTML = `<div class="grid grid-cols-2 gap-4 mt-6">` +
-                diary.photoURLs.slice(1).map(url => `
-                    <div>
-                        <img src="${url}" alt="日記照片" class="w-full h-full object-cover rounded-lg shadow-lg">
-                    </div>
-                `).join('') + `</div>`;
+            // FIX: Safely parse events if it's a string
+            let eventsArray = diary.events;
+            if (typeof eventsArray === 'string') {
+                try {
+                    eventsArray = JSON.parse(eventsArray);
+                } catch (e) {
+                    console.error("Failed to parse diary events:", e);
+                    eventsArray = null; // Set to null on error
+                }
             }
 
-            detailContainer.innerHTML = `
-                <div>
-                    <img src="${coverImage}" alt="日記封面" class="w-full h-64 object-cover">
-                </div>
-                <div class="p-5 space-y-4">
-                    <p id="detail-intro-text" class="text-lg font-semibold text-gray-800 leading-relaxed">${diary.intro || '...'}</p>
-                    <hr class="border-gray-200">
-                    <p id="detail-body-text" class="text-gray-700 leading-relaxed whitespace-pre-wrap">${diary.content || '...'}</p>
+            // Check for the new data structure (with events)
+            if (eventsArray && Array.isArray(eventsArray)) {
+                // RENDER NEW TIMELINE VIEW
+                const overallStoryHTML = `
+                    <div class="p-5">
+                        <h1 class="text-2xl font-bold text-gray-900">${diary.title}</h1>
+                        <p class="mt-2 text-base text-gray-700 leading-relaxed">${diary.overall_story || ''}</p>
+                        <hr class="mt-4 border-gray-200">
+                    </div>
+                `;
+
+                const eventsHTML = eventsArray.map((event, index) => {
+                    const imageUrl = diary.photoURLs && diary.photoURLs[index] ? diary.photoURLs[index] : 'https://placehold.co/414x300/cccccc/ffffff?text=Image+Not+Found';
+                    return `
+                        <div class="mb-6">
+                            <div class="w-full bg-black">
+                                <img src="${imageUrl}" alt="事件照片 ${index + 1}" class="w-full h-auto object-contain block" style="max-height: 70vh;">
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-center text-sm text-gray-500 space-x-4 mb-3">
+                                    <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>${event.time || '未知時間'}</span>
+                                    <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>${event.location || '未知地點'}</span>
+                                </div>
+                                <p class="text-base text-gray-600 leading-relaxed">${event.description || ''}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                detailContainer.innerHTML = overallStoryHTML + eventsHTML;
+
+            } else {
+                // RENDER OLD (FALLBACK) VIEW for backward compatibility
+                const coverImage = (diary.photoURLs && diary.photoURLs.length > 0) 
+                    ? diary.photoURLs[0] 
+                    : `https://placehold.co/600x450/6EE7B7/1F2937?text=${encodeURIComponent(diary.title)}`;
+                
+                const diaryDate = diary.diaryDate ? new Date(diary.diaryDate.seconds * 1000).toLocaleDateString('zh-TW') : (diary.createdAt ? diary.createdAt.toDate().toLocaleDateString('zh-TW') : '未知日期');
+
+                let imagesHTML = '';
+                if (diary.photoURLs && diary.photoURLs.length > 1) {
+                    imagesHTML = `<div class="p-5 pt-0"><div class="grid grid-cols-2 gap-4">` +
+                    diary.photoURLs.slice(1).map(url => `
+                        <div>
+                            <img src="${url}" alt="日記照片" class="w-full h-full object-cover rounded-lg shadow-md">
+                        </div>
+                    `).join('') + `</div></div>`;
+                }
+
+                detailContainer.innerHTML = `
+                    <div class="w-full">
+                        <img src="${coverImage}" alt="日記封面" class="w-full h-auto object-contain block" style="max-height: 70vh;">
+                    </div>
+                    <div class="p-5 space-y-4">
+                        <div class="flex items-center text-sm text-gray-500 space-x-4">
+                            <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>${diaryDate}</span>
+                            <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>${diary.location || '未知地點'}</span>
+                        </div>
+                        <hr class="border-gray-200">
+                        <h1 class="text-2xl font-bold text-gray-900">${diary.title}</h1>
+                        <p id="detail-intro-text" class="text-base text-gray-700 leading-relaxed">${diary.intro || diary.content || '...'}</p>
+                    </div>
                     ${imagesHTML}
-                </div>
-            `;
+                `;
+            }
+
             navigateTo('detail-screen');
         }
 
@@ -903,11 +946,11 @@
                     : `https://placehold.co/600x400/34D399/FFFFFF?text=${encodeURIComponent(diary.title)}`;
 
                 const diaryCard = document.createElement('div');
-                diaryCard.className = 'memory-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300';
+                diaryCard.className = 'memory-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-300';
                 diaryCard.innerHTML = `
                     <img src="${coverImage}" alt="${diary.title}" class="w-full h-40 object-cover">
                     <div class="p-4 relative">
-                        <h2 class="text-lg font-bold text-gray-800">${diary.title}</h2>
+                        <h2 class="text-lg font-bold text-gray-800 truncate">${diary.title}</h2>
                         <p class="text-xs text-gray-400 mt-2">${date}</p>
                         <div class="absolute bottom-2 right-2 text-gray-400" title="${diary.privacy}">${privacyIcon}</div>
                     </div>
@@ -1081,15 +1124,13 @@
                 img.className = "rounded-lg w-full h-full object-cover";
 
                 const removeBtn = document.createElement('button');
-                // MODIFIED: Changed button colors
                 removeBtn.className = 'absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-sm font-bold leading-none hover:bg-red-600 transition-colors z-10';
                 removeBtn.innerHTML = '&times;';
                 removeBtn.title = "移除這張照片";
                 removeBtn.dataset.index = index;
 
                 const orderBadge = document.createElement('div');
-                // MODIFIED: Changed badge colors
-                orderBadge.className = 'absolute top-2 left-2 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold z-10';
+                orderBadge.className = 'absolute top-2 left-2 w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-sm font-bold z-10';
                 orderBadge.textContent = index + 1;
 
                 removeBtn.addEventListener('click', (event) => {
@@ -1194,7 +1235,11 @@
                     uploadedPhotoURLs.push(...await Promise.all(uploadPromises));
                 }
 
-                const textPrompt = `請根據我提供的照片，用${styleText}生成一個適合的「標題」和一篇約150字的「日記內容」。`;
+                const textPrompt = `請根據我提供的 ${selectedFiles.length} 張照片，用${styleText}風格，生成一個JSON物件。物件需包含：
+1. "title": 符合風格的故事標題。
+2. "overall_story": 將所有照片串連起來的總結性故事。
+3. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (照片1的時間，如果未知請推測), "location" (照片1的地點，如果未知請推測具體名稱), "description" (照片1的事件描述，100字內)。`;
+                
                 const imageParts = await Promise.all(selectedFiles.map(fileToGenerativePart));
                 
                 const payload = {
@@ -1205,9 +1250,21 @@
                             type: "OBJECT",
                             properties: {
                                 "title": { "type": "STRING" },
-                                "content": { "type": "STRING" }
+                                "overall_story": { "type": "STRING" },
+                                "events": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "time": { "type": "STRING" },
+                                            "location": { "type": "STRING" },
+                                            "description": { "type": "STRING" }
+                                        },
+                                        "required": ["time", "location", "description"]
+                                    }
+                                }
                             },
-                            required: ["title", "content"]
+                            required: ["title", "overall_story", "events"]
                         }
                     }
                 };
@@ -1221,22 +1278,25 @@
                 });
 
                 if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error("API Error Response:", errorBody);
                     throw new Error(`API call failed with status: ${response.status}`);
                 }
 
                 const result = await response.json();
+                if (!result.candidates || !result.candidates[0].content.parts[0].text) {
+                     throw new Error("Invalid API response structure.");
+                }
                 const generatedData = JSON.parse(result.candidates[0].content.parts[0].text);
                 
-                const sentences = generatedData.content.split(/[。\n]/).filter(s => s.trim() !== '');
-                const intro = sentences.length > 1 ? sentences.slice(0, 2).join('。') + '。' : generatedData.content;
-
                 const diaryData = {
                     title: generatedData.title,
+                    overall_story: generatedData.overall_story,
+                    // FIX: Stringify events array before saving to Firestore
+                    events: JSON.stringify(generatedData.events),
                     privacy: privacy,
                     authorId: user.uid,
                     createdAt: serverTimestamp(),
-                    content: generatedData.content,
-                    intro: intro,
                     photoURLs: uploadedPhotoURLs
                 };
                 
@@ -1273,23 +1333,9 @@
         const editButton = document.getElementById('edit-button');
         if(editButton) {
             editButton.addEventListener('click', () => {
-                document.getElementById('edit-intro-text').value = document.getElementById('detail-intro-text').textContent;
-                document.getElementById('edit-body-text').value = document.getElementById('detail-body-text').textContent;
-                navigateTo('edit-screen');
-            });
-        }
-        document.querySelectorAll('.like-button').forEach(button => {
-            button.addEventListener('click', () => {
-                button.classList.toggle('liked');
-            })
-        });
-
-        const saveButton = document.getElementById('save-button');
-        if(saveButton) {
-            saveButton.addEventListener('click', () => {
-                document.getElementById('detail-intro-text').textContent = document.getElementById('edit-intro-text').value;
-                document.getElementById('detail-body-text').textContent = document.getElementById('edit-body-text').value;
-                goBack();
+                // This part needs to be adapted for the new data structure if editing is required.
+                // For now, it's disabled in the detail view.
+                alert("編輯功能正在開發中！");
             });
         }
 
@@ -1304,6 +1350,7 @@
             document.querySelectorAll('.share-group-button').forEach(button => {
                 button.addEventListener('click', () => {
                     const groupName = button.querySelector('span:last-child').textContent;
+                    // Replace alert with a custom modal in a real app
                     alert(`日記已分享給 ${groupName}！`);
                     modalContainer.classList.remove('visible');
                 });
@@ -1348,6 +1395,7 @@
                 e.target.disabled = true;
                 e.target.classList.remove('bg-blue-500');
                 e.target.classList.add('bg-gray-200', 'text-gray-500', 'cursor-not-allowed');
+                // Replace alert with a custom modal in a real app
                 alert('已送出邀請！');
             });
         });
@@ -1364,6 +1412,7 @@
              copyInviteLinkButton.addEventListener('click', () => {
                 const linkInput = copyInviteLinkButton.previousElementSibling;
                 navigator.clipboard.writeText(linkInput.value).then(() => {
+                     // Replace alert with a custom modal in a real app
                     alert('邀請連結已複製！');
                 });
             });
@@ -1420,3 +1469,4 @@
     </script>
 </body>
 </html>
+�
