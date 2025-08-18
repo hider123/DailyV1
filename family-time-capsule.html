@@ -166,6 +166,40 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* --- Timeline Styles --- */
+        .timeline-item {
+            position: relative;
+            padding-left: 30px; 
+            padding-bottom: 2rem;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            bottom: -8px; 
+            width: 2px;
+            background-color: #e2e8f0; /* gray-200 */
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background-color: #f59e0b; /* amber-500 */
+            border: 3px solid white;
+            border-radius: 50%;
+            z-index: 1;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -506,16 +540,17 @@
                 </header>
                 <div class="overflow-y-auto flex-1">
                     <main class="p-5">
-                        <div class="relative mb-4">
-                            <img src="https://placehold.co/600x450/6EE7B7/1F2937?text=花海中的笑聲" alt="陽明山繡球花海封面" class="w-full h-64 object-cover rounded-lg">
+                        <div class="mb-6">
+                            <label class="text-lg font-semibold text-gray-700">標題</label>
+                            <input type="text" id="edit-title" class="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400">
                         </div>
-                        <div>
-                            <label class="text-lg font-semibold text-gray-700">封面故事</label>
-                            <textarea id="edit-intro-text" class="w-full mt-2 p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-amber-400 focus:border-amber-400"></textarea>
+                        <div class="mb-6">
+                            <label class="text-lg font-semibold text-gray-700">總結故事</label>
+                            <textarea id="edit-overall-story" class="w-full mt-2 p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-amber-400 focus:border-amber-400"></textarea>
                         </div>
-                        <div class="mt-6">
-                            <label class="text-lg font-semibold text-gray-700">日記內文</label>
-                            <textarea id="edit-body-text" class="w-full mt-2 p-3 border border-gray-300 rounded-lg h-40 focus:ring-2 focus:ring-amber-400 focus:border-amber-400"></textarea>
+                        <hr class="my-6">
+                        <div id="edit-events-container" class="space-y-6">
+                            <!-- Dynamic event editors will be inserted here -->
                         </div>
                     </main>
                 </div>
@@ -544,7 +579,7 @@
                             <span>&gt;</span>
                         </button>
                         <div class="mt-8 space-y-2">
-                             <button id="go-to-earnings" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>� 創作者收益中心</span><span>&gt;</span></button>
+                             <button id="go-to-earnings" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>💰 創作者收益中心</span><span>&gt;</span></button>
                              <button id="go-to-groups" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>👨‍👩‍👧‍👦 管理我的群組</span><span>&gt;</span></button>
                              <button id="go-to-writing-style" class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>✍️ AI 寫作風格</span><span>&gt;</span></button>
                              <button class="w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><span>🔔 通知設定</span><span>&gt;</span></button>
@@ -601,7 +636,7 @@
                 <div class="overflow-y-auto flex-1">
                     <main class="p-6">
                         <div class="space-y-3">
-                            <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>👨‍👩‍👧‍👦 家人群組</p><p class="text-xs text-gray-500">5 位成員</p></div><span>&gt;</span></button>
+                            <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>👨‍👩‍👧‍� 家人群組</p><p class="text-xs text-gray-500">5 位成員</p></div><span>&gt;</span></button>
                             <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>🧑‍🤝‍🧑 朋友群組</p><p class="text-xs text-gray-500">12 位成員</p></div><span>&gt;</span></button>
                             <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>🏕️ 露營好夥伴</p><p class="text-xs text-gray-500">8 位成員</p></div><span>&gt;</span></button>
                         </div>
@@ -774,7 +809,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         // Your web app's Firebase configuration
@@ -806,6 +841,7 @@
         let navigationStack = ['auth-screen']; // Start with auth screen
         let diariesUnsubscribe = null; // To hold the listener unsubscribe function
         let selectedFiles = []; // To store selected files globally
+        let currentDiary = null; // To hold the currently viewed diary object
 
         function showPage(targetId, isSubPage = false) {
             pages.forEach(page => {
@@ -837,6 +873,7 @@
         }
         
         function showDiaryDetail(diary) {
+            currentDiary = diary; // Store the current diary object
             document.getElementById('detail-title').textContent = diary.title || '日記詳情';
             const detailContainer = document.getElementById('detail-content-container');
             detailContainer.innerHTML = ''; // Clear previous content
@@ -863,29 +900,28 @@
                     </div>
                 `;
 
-                const eventsHTML = eventsArray.map((event, index) => {
+                const eventsHTML = `<div class="relative px-5 py-2">${eventsArray.map((event, index) => {
                     const imageUrl = diary.photoURLs && diary.photoURLs[index] ? diary.photoURLs[index] : 'https://placehold.co/414x300/cccccc/ffffff?text=Image+Not+Found';
                     return `
-                        <div class="mb-6">
-                            <div class="w-full bg-black">
+                        <div class="timeline-item">
+                             <div class="timeline-dot"></div>
+                             <div class="w-full bg-black rounded-lg overflow-hidden mb-4">
                                 <img src="${imageUrl}" alt="事件照片 ${index + 1}" class="w-full h-auto object-contain block" style="max-height: 70vh;">
                             </div>
-                            <div class="p-5">
-                                <div class="flex items-center text-sm text-gray-500 space-x-4 mb-3">
-                                    <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>${event.time || '未知時間'}</span>
-                                    <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>${event.location || '未知地點'}</span>
-                                </div>
-                                <p class="text-base text-gray-600 leading-relaxed">${event.description || ''}</p>
+                            <div class="flex items-center text-sm text-gray-500 space-x-4 mb-3">
+                                <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>${event.time || '未知時間'}</span>
+                                <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>${event.location || '未知地點'}</span>
                             </div>
+                            <p class="text-base text-gray-600 leading-relaxed">${event.description || ''}</p>
                         </div>
                     `;
-                }).join('');
+                }).join('')}</div>`;
 
                 detailContainer.innerHTML = overallStoryHTML + eventsHTML;
 
             } else {
                 // RENDER OLD (FALLBACK) VIEW for backward compatibility
-                const coverImage = (diary.photoURLs && diary.photoURLs.length > 0) 
+                 const coverImage = (diary.photoURLs && diary.photoURLs.length > 0) 
                     ? diary.photoURLs[0] 
                     : `https://placehold.co/600x450/6EE7B7/1F2937?text=${encodeURIComponent(diary.title)}`;
                 
@@ -902,7 +938,7 @@
                 }
 
                 detailContainer.innerHTML = `
-                    <div class="w-full">
+                    <div class="w-full bg-black">
                         <img src="${coverImage}" alt="日記封面" class="w-full h-auto object-contain block" style="max-height: 70vh;">
                     </div>
                     <div class="p-5 space-y-4">
@@ -1315,27 +1351,92 @@
             }
         });
         
-        const skipQuestionButton = document.getElementById('skip-question-button');
-        const continueGenerationButton = document.getElementById('continue-generation-button');
-        
-        function proceedToGeneration() {
-            navigateTo('loading-screen');
-            setTimeout(() => {
-                navigationStack.pop(); 
-                navigationStack.pop(); 
-                navigateTo('detail-screen');
-            }, 2500);
-        }
-
-        if(skipQuestionButton) skipQuestionButton.addEventListener('click', proceedToGeneration);
-        if(continueGenerationButton) continueGenerationButton.addEventListener('click', proceedToGeneration);
-
         const editButton = document.getElementById('edit-button');
         if(editButton) {
             editButton.addEventListener('click', () => {
-                // This part needs to be adapted for the new data structure if editing is required.
-                // For now, it's disabled in the detail view.
-                alert("編輯功能正在開發中！");
+                if (!currentDiary) return;
+                
+                let eventsArray = currentDiary.events;
+                if (typeof eventsArray === 'string') {
+                    try {
+                        eventsArray = JSON.parse(eventsArray);
+                    } catch (e) {
+                        eventsArray = [];
+                    }
+                }
+
+                if (!Array.isArray(eventsArray)) {
+                    alert("此日記格式不支援編輯。");
+                    return;
+                }
+
+                document.getElementById('edit-title').value = currentDiary.title || '';
+                document.getElementById('edit-overall-story').value = currentDiary.overall_story || '';
+                
+                const eventsContainer = document.getElementById('edit-events-container');
+                eventsContainer.innerHTML = ''; // Clear previous
+                
+                eventsArray.forEach((event, index) => {
+                    const eventEditorHTML = `
+                        <div>
+                            <label class="text-base font-semibold text-gray-600">事件 ${index + 1} 描述</label>
+                            <textarea data-event-index="${index}" class="edit-event-description w-full mt-1 p-2 border border-gray-300 rounded-lg h-20">${event.description || ''}</textarea>
+                        </div>
+                    `;
+                    eventsContainer.insertAdjacentHTML('beforeend', eventEditorHTML);
+                });
+
+                navigateTo('edit-screen');
+            });
+        }
+
+        const saveButton = document.getElementById('save-button');
+        if(saveButton) {
+            saveButton.addEventListener('click', async () => {
+                if (!currentDiary || !currentDiary.id) {
+                    alert("找不到要儲存的日記！");
+                    return;
+                }
+
+                const newTitle = document.getElementById('edit-title').value;
+                const newOverallStory = document.getElementById('edit-overall-story').value;
+                const descriptionElements = document.querySelectorAll('.edit-event-description');
+                
+                let currentEvents = currentDiary.events;
+                 if (typeof currentEvents === 'string') {
+                    try {
+                       currentEvents = JSON.parse(currentEvents);
+                    } catch(e) {
+                        currentEvents = [];
+                    }
+                }
+
+                const newEvents = Array.from(descriptionElements).map((textarea, index) => {
+                    return {
+                        ...currentEvents[index], // Preserve time and location
+                        description: textarea.value
+                    };
+                });
+
+                const updatedData = {
+                    title: newTitle,
+                    overall_story: newOverallStory,
+                    events: JSON.stringify(newEvents)
+                };
+
+                try {
+                    const diaryRef = doc(db, "diaries", currentDiary.id);
+                    await updateDoc(diaryRef, updatedData);
+                    
+                    // Update the local currentDiary object and re-render the detail page
+                    currentDiary = { ...currentDiary, ...updatedData };
+                    goBack(); // Go back to detail screen
+                    showDiaryDetail(currentDiary); // Re-render with new data
+
+                } catch (error) {
+                    console.error("更新日記失敗:", error);
+                    alert("儲存失敗，請稍後再試。");
+                }
             });
         }
 
