@@ -548,6 +548,14 @@
                             <label class="text-lg font-semibold text-gray-700">總結故事</label>
                             <textarea id="edit-overall-story" class="w-full mt-2 p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-amber-400 focus:border-amber-400"></textarea>
                         </div>
+                        <div class="mb-6">
+                            <label class="text-lg font-semibold text-gray-700 mb-2">誰可以看見？</label>
+                            <select id="edit-privacy-select" class="w-full p-3 border border-gray-300 rounded-lg bg-white">
+                                <option value="private">🔒 僅限自己</option>
+                                <option value="group">👨‍👩‍👧‍👦 特定群組</option>
+                                <option value="public">🌐 公開到社群</option>
+                            </select>
+                        </div>
                         <hr class="my-6">
                         <div id="edit-events-container" class="space-y-6">
                             <!-- Dynamic event editors will be inserted here -->
@@ -809,7 +817,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         // Your web app's Firebase configuration
@@ -840,6 +848,7 @@
         
         let navigationStack = ['auth-screen']; // Start with auth screen
         let diariesUnsubscribe = null; // To hold the listener unsubscribe function
+        let commentsUnsubscribe = null; // To hold the listener for comments
         let selectedFiles = []; // To store selected files globally
         let currentDiary = null; // To hold the currently viewed diary object
 
@@ -894,28 +903,33 @@
                 // RENDER NEW TIMELINE VIEW
                 const summaryHTML = `
                     <div class="p-5">
-                         <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg mb-4">
-                            <p class="font-bold text-amber-800">一句話亮點：</p>
-                            <p class="italic text-amber-700">“${diary.highlight_quote || '未提供'}”</p>
-                             <p class="font-bold text-amber-800 mt-2">最常出現的人物：</p>
-                            <p class="text-amber-700">${diary.main_character || '未提供'}</p>
-                        </div>
                         <h1 class="text-2xl font-bold text-gray-900">${diary.title}</h1>
                         <hr class="mt-4 border-gray-200">
                     </div>
                 `;
 
-                const eventsHTML = `<div class="relative px-5 py-2">${eventsArray.map((event, index) => {
-                    const imageUrl = diary.photoURLs && diary.photoURLs[index] ? diary.photoURLs[index] : 'https://placehold.co/414x300/cccccc/ffffff?text=Image+Not+Found';
+                const eventsHTML = `<div class="relative px-5 py-2">${(diary.photoURLs || []).map((imageUrl, index) => {
+                    const event = eventsArray[index] || {}; // Get corresponding event, or empty object
                     return `
                         <div class="timeline-item">
                              <div class="timeline-dot"></div>
                              <div class="w-full bg-black rounded-lg overflow-hidden mb-4 shadow-lg">
                                 <img src="${imageUrl}" alt="事件照片 ${index + 1}" class="w-full h-auto object-contain block" style="max-height: 70vh;">
                             </div>
-                            <div class="flex items-center text-sm text-gray-500 space-x-4 mb-3">
-                                <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>${event.time || '未知時間'}</span>
-                                <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>${event.location || '未知地點'}</span>
+                            <div class="space-y-2 mb-3">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>${event.time || '未知時間'}</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span>${event.location || '未知地點'}</span>
+                                </div>
                             </div>
                             <p class="text-base text-gray-600 leading-relaxed">${event.description || ''}</p>
                         </div>
@@ -947,9 +961,20 @@
                         <img src="${coverImage}" alt="日記封面" class="w-full h-auto object-contain block" style="max-height: 70vh;">
                     </div>
                     <div class="p-5 space-y-4">
-                        <div class="flex items-center text-sm text-gray-500 space-x-4">
-                            <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>${diaryDate}</span>
-                            <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>${diary.location || '未知地點'}</span>
+                        <div class="space-y-2">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>${diaryDate}</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span>${diary.location || '未知地點'}</span>
+                            </div>
                         </div>
                         <hr class="border-gray-200">
                         <h1 class="text-2xl font-bold text-gray-900">${diary.title}</h1>
@@ -1279,9 +1304,7 @@
                 const textPrompt = `請根據我提供的 ${selectedFiles.length} 張照片，用${styleText}風格，生成一個JSON物件。物件需包含：
 1. "title": 符合風格的故事標題。
 2. "overall_story": 將所有照片串連起來的總結性故事。
-3. "highlight_quote": 總結這次活動的「一句話亮點」。
-4. "main_character": 辨識出照片中「最常出現的人物」。
-5. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (照片的時間，如果未知請推測), "location" (照片的地點，如果未知請推測具體名稱), "description" (照片的事件描述，100字內)。`;
+3. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (照片的時間，如果未知請推測), "location" (照片的地點，如果未知請推測具體名稱), "description" (照片的事件描述，100字內)。`;
                 
                 const imageParts = await Promise.all(selectedFiles.map(fileToGenerativePart));
                 
@@ -1294,8 +1317,6 @@
                             properties: {
                                 "title": { "type": "STRING" },
                                 "overall_story": { "type": "STRING" },
-                                "highlight_quote": { "type": "STRING" },
-                                "main_character": { "type": "STRING" },
                                 "events": {
                                     "type": "ARRAY",
                                     "items": {
@@ -1309,7 +1330,7 @@
                                     }
                                 }
                             },
-                            required: ["title", "overall_story", "highlight_quote", "main_character", "events"]
+                            required: ["title", "overall_story", "events"]
                         }
                     }
                 };
@@ -1337,8 +1358,6 @@
                 const diaryData = {
                     title: generatedData.title,
                     overall_story: generatedData.overall_story,
-                    highlight_quote: generatedData.highlight_quote,
-                    main_character: generatedData.main_character,
                     events: JSON.stringify(generatedData.events),
                     privacy: privacy,
                     authorId: user.uid,
@@ -1382,6 +1401,7 @@
 
                 document.getElementById('edit-title').value = currentDiary.title || '';
                 document.getElementById('edit-overall-story').value = currentDiary.overall_story || '';
+                document.getElementById('edit-privacy-select').value = currentDiary.privacy || 'private';
                 
                 const eventsContainer = document.getElementById('edit-events-container');
                 eventsContainer.innerHTML = ''; // Clear previous
@@ -1410,6 +1430,7 @@
 
                 const newTitle = document.getElementById('edit-title').value;
                 const newOverallStory = document.getElementById('edit-overall-story').value;
+                const newPrivacy = document.getElementById('edit-privacy-select').value;
                 const descriptionElements = document.querySelectorAll('.edit-event-description');
                 
                 let currentEvents = currentDiary.events;
@@ -1431,6 +1452,7 @@
                 const updatedData = {
                     title: newTitle,
                     overall_story: newOverallStory,
+                    privacy: newPrivacy,
                     events: JSON.stringify(newEvents)
                 };
 
