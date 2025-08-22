@@ -102,14 +102,14 @@
         .bottom-nav-item.active p {
             color: #f59e0b; /* amber-500 */
         }
-        .like-button .heart-icon-outline { display: inline-block; }
-        .like-button .heart-icon-solid { display: none; }
-        .like-button.liked .heart-icon-outline { display: none; }
-        
-        /* --- Like Button Animation --- */
-        .like-button.liked .heart-icon-solid {
-            display: inline-block;
-            color: #ef4444; /* red-500 */
+        .like-button .heart-icon {
+            fill: none;
+            stroke: currentColor;
+            transition: all 0.2s ease-in-out;
+        }
+        .like-button.liked .heart-icon {
+            fill: #ef4444; /* red-500 */
+            stroke: #ef4444;
             animation: heart-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -200,6 +200,10 @@
             border-radius: 50%;
             z-index: 1;
         }
+        .cover-photo {
+            border: 4px solid #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -241,7 +245,7 @@
             <div id="home-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200 flex-shrink-0">
                     <div class="flex justify-between items-center">
-                        <div><h1 id="greeting" class="text-xl font-bold text-gray-800">下午好！</h1></div>
+                        <div><h1 id="greeting" class="text-xl font-bold text-gray-800">您好！</h1></div>
                         <div class="flex items-center space-x-4">
                             <button id="settings-button" class="text-gray-500 hover:text-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
                         </div>
@@ -260,7 +264,7 @@
             <div id="explore-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200 flex-shrink-0">
                     <div class="relative">
-                        <input type="text" placeholder="搜尋日記、創作者或地點..." class="w-full bg-gray-100 border border-gray-200 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="text" id="search-input" placeholder="搜尋日記、創作者或 #地點標籤..." class="w-full bg-gray-100 border border-gray-200 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-amber-400">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></div>
                     </div>
                 </header>
@@ -284,6 +288,16 @@
                                      <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#美食之旅</button>
                                      <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#咖啡廳</button>
                                      <button class="px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-semibold flex-shrink-0">#海邊走走</button>
+                                 </div>
+                            </div>
+                            <div class="mb-6">
+                                 <h2 class="text-base font-bold text-gray-700 mb-3">熱門地點</h2>
+                                 <div class="tag-carousel flex space-x-3 overflow-x-auto pb-2">
+                                     <button class="location-tag-button px-4 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-semibold flex-shrink-0">#陽明山</button>
+                                     <button class="location-tag-button px-4 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-semibold flex-shrink-0">#墾丁</button>
+                                     <button class="location-tag-button px-4 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-semibold flex-shrink-0">#台南古蹟</button>
+                                     <button class="location-tag-button px-4 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-semibold flex-shrink-0">#駁二</button>
+                                     <button class="location-tag-button px-4 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-semibold flex-shrink-0">#清境農場</button>
                                  </div>
                             </div>
                             <h2 class="text-base font-bold text-gray-700 mb-3">熱門創作者</h2><div class="flex space-x-4 overflow-x-auto pb-3">
@@ -405,6 +419,25 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- ================================================== -->
+            <!-- =====       搜尋結果頁 (Search Results)   ===== -->
+            <!-- ================================================== -->
+            <div id="search-results-screen" class="page">
+                <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200 flex items-center flex-shrink-0">
+                    <button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <h1 id="search-results-title" class="text-base font-bold text-gray-800 mx-auto">搜尋結果</h1>
+                    <div class="w-6"></div> <!-- Placeholder for alignment -->
+                </header>
+                <div class="overflow-y-auto flex-1">
+                    <main class="p-4 pb-24">
+                        <div id="search-results-grid" class="masonry">
+                           <!-- Search results will be injected here -->
+                        </div>
+                    </main>
+                </div>
+            </div>
+
 
             <!-- ================================================== -->
             <!-- =====    創作者個人主頁 (Profile)        ===== -->
@@ -560,6 +593,18 @@
                         <div id="edit-events-container" class="space-y-6">
                             <!-- Dynamic event editors will be inserted here -->
                         </div>
+                        <hr class="my-8 border-dashed">
+                        <div id="edit-style-container" class="mt-6">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">AI 風格重塑</h3>
+                             <div class="space-y-2">
+                                <label class="flex items-start p-3 bg-white border-2 border-amber-400 rounded-lg"><input type="radio" name="edit-writing-style" value="warm" class="mt-1 text-amber-500 focus:ring-amber-400" checked><div class="ml-3"><p class="font-semibold">溫馨感性風</p></div></label>
+                                <label class="flex items-start p-3 bg-white border rounded-lg"><input type="radio" name="edit-writing-style" value="fun" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3"><p class="font-semibold">活潑有趣風</p></div></label>
+                                <label class="flex items-start p-3 bg-white border rounded-lg"><input type="radio" name="edit-writing-style" value="simple" class="mt-1 text-amber-500 focus:ring-amber-400"><div class="ml-3"><p class="font-semibold">簡潔紀錄風</p></div></label>
+                            </div>
+                            <button id="regenerate-button" class="mt-4 w-full bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all flex items-center justify-center">
+                                ✨ 套用新風格重寫
+                            </button>
+                        </div>
                     </main>
                 </div>
             </div>
@@ -579,10 +624,10 @@
                 <div class="overflow-y-auto flex-1">
                     <main class="p-6">
                         <button id="go-to-profile-edit" class="w-full text-left bg-white p-4 rounded-lg border flex items-center mb-8">
-                            <img class="w-12 h-12 rounded-full" src="https://placehold.co/100x100/fde68a/a16207?text=林" alt="User Avatar">
+                            <img id="settings-avatar" class="w-12 h-12 rounded-full" src="https://placehold.co/100x100/e2e8f0/475569?text=?" alt="User Avatar">
                             <div class="ml-4 flex-1">
-                                <p class="font-bold">林媽媽</p>
-                                <p class="text-xs text-gray-500">@lin_mama</p>
+                                <p id="settings-display-name" class="font-bold">訪客</p>
+                                <p id="settings-username" class="text-xs text-gray-500">@guest</p>
                             </div>
                             <span>&gt;</span>
                         </button>
@@ -644,7 +689,7 @@
                 <div class="overflow-y-auto flex-1">
                     <main class="p-6">
                         <div class="space-y-3">
-                            <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>👨‍👩‍👧‍👦 家人群組</p><p class="text-xs text-gray-500">5 位成員</p></div><span>&gt;</span></button>
+                            <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>👨‍👩‍👧‍� 家人群組</p><p class="text-xs text-gray-500">5 位成員</p></div><span>&gt;</span></button>
                             <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>🧑‍🤝‍🧑 朋友群組</p><p class="text-xs text-gray-500">12 位成員</p></div><span>&gt;</span></button>
                             <button class="group-item w-full text-left bg-white p-4 rounded-lg border flex justify-between items-center"><div><p>🏕️ 露營好夥伴</p><p class="text-xs text-gray-500">8 位成員</p></div><span>&gt;</span></button>
                         </div>
@@ -706,20 +751,20 @@
             <!-- =====    編輯個人資料頁 (Profile Edit)     ===== -->
             <!-- ================================================== -->
             <div id="profile-edit-screen" class="page">
-                <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">編輯個人資料</h1><button class="text-amber-500 font-bold w-12">儲存</button></header>
+                <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm z-10 border-b border-gray-200 flex items-center flex-shrink-0"><button class="go-back-button text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-base font-bold text-gray-800 mx-auto">編輯個人資料</h1><button id="save-profile-button" class="text-amber-500 font-bold w-12">儲存</button></header>
                 <div class="overflow-y-auto flex-1">
                     <main class="p-6">
                         <div class="flex flex-col items-center">
                             <div class="relative">
-                                <img class="w-24 h-24 rounded-full" src="https://placehold.co/100x100/fde68a/a16207?text=林" alt="User Avatar">
+                                <img id="profile-edit-avatar" class="w-24 h-24 rounded-full" src="https://placehold.co/100x100/fde68a/a16207?text=林" alt="User Avatar">
                                 <button class="absolute -bottom-1 -right-1 bg-white rounded-full p-1 border shadow"><svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 011.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
                             </div>
                         </div>
                         <div class="mt-8 space-y-4">
-                            <div><label class="text-sm font-semibold text-gray-600">使用者名稱</label><input type="text" value="@lin_mama" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-100" readonly></div>
-                            <div><label class="text-sm font-semibold text-gray-600">顯示名稱</label><input type="text" value="林媽媽" class="w-full mt-1 p-2 border border-gray-300 rounded-lg"></div>
-                            <div><label class="text-sm font-semibold text-gray-600">個人簡介</label><textarea class="w-full mt-1 p-2 border border-gray-300 rounded-lg h-24">熱愛用照片記錄家庭生活的點點滴滴。</textarea></div>
-                            <div><label class="text-sm font-semibold text-gray-600">電子郵件</label><input type="email" value="lin.mama@email.com" class="w-full mt-1 p-2 border border-gray-300 rounded-lg"></div>
+                            <div><label class="text-sm font-semibold text-gray-600">使用者名稱</label><input type="text" id="profile-edit-username" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-100" readonly></div>
+                            <div><label class="text-sm font-semibold text-gray-600">顯示名稱</label><input type="text" id="profile-edit-display-name" class="w-full mt-1 p-2 border border-gray-300 rounded-lg"></div>
+                            <div><label class="text-sm font-semibold text-gray-600">個人簡介</label><textarea id="profile-edit-bio" class="w-full mt-1 p-2 border border-gray-300 rounded-lg h-24"></textarea></div>
+                            <div><label class="text-sm font-semibold text-gray-600">電子郵件</label><input type="email" id="profile-edit-email" class="w-full mt-1 p-2 border border-gray-300 rounded-lg"></div>
                             <button class="w-full text-blue-600 text-left pt-2">更改密碼</button>
                         </div>
                     </main>
@@ -743,7 +788,7 @@
                                      <p class="font-semibold">✍️ 自訂風格</p>
                                      <textarea id="custom-prompt-style" class="w-full mt-2 p-2 border rounded text-sm bg-gray-50" rows="3" placeholder="請輸入您希望的寫作風格提示詞，例如：請用古龍的武俠小說風格來寫..." disabled></textarea>
                                  </div>
-                            </label>
+                             </label>
                         </div>
                     </main>
                 </div>
@@ -817,7 +862,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, where, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, orderBy, setLogLevel, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         // Your web app's Firebase configuration
@@ -835,6 +880,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
+        setLogLevel('debug'); // Enable debug logging for Firebase
 
         // --- DOM Elements ---
         const pages = document.querySelectorAll('.page');
@@ -849,8 +895,11 @@
         let navigationStack = ['auth-screen']; // Start with auth screen
         let diariesUnsubscribe = null; // To hold the listener unsubscribe function
         let commentsUnsubscribe = null; // To hold the listener for comments
+        let userProfileUnsubscribe = null;
+        let currentUserProfile = null;
         let selectedFiles = []; // To store selected files globally
         let currentDiary = null; // To hold the currently viewed diary object
+        let selectedCoverIndex = 0; // To store the user-selected cover photo index
 
         function showPage(targetId, isSubPage = false) {
             pages.forEach(page => {
@@ -870,6 +919,10 @@
         }
 
         function goBack() {
+            if (commentsUnsubscribe) {
+                commentsUnsubscribe();
+                commentsUnsubscribe = null;
+            }
             if (navigationStack.length > 1) {
                 navigationStack.pop();
                 const targetId = navigationStack[navigationStack.length - 1];
@@ -881,108 +934,207 @@
             }
         }
         
+        function renderComments(comments) {
+            const commentsList = document.getElementById('comments-list');
+            if (!commentsList) return;
+            commentsList.innerHTML = '';
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">還沒有任何留言。</p>';
+                return;
+            }
+            comments.forEach(comment => {
+                const date = comment.createdAt ? comment.createdAt.toDate().toLocaleString('zh-TW') : '';
+                const commentEl = document.createElement('div');
+                commentEl.className = 'flex items-start space-x-3';
+                let imageHTML = '';
+                if (comment.imageUrl) {
+                    imageHTML = `<img src="${comment.imageUrl}" class="mt-2 rounded-lg max-w-full h-auto" style="max-height: 150px;">`;
+                }
+                commentEl.innerHTML = `
+                    <img class="w-8 h-8 rounded-full" src="https://placehold.co/100x100/e2e8f0/475569?text=${comment.authorName.charAt(0)}" alt="${comment.authorName}">
+                    <div class="flex-1">
+                        <div class="bg-gray-100 rounded-lg p-3">
+                            <p class="font-semibold text-sm">${comment.authorName}</p>
+                            <p class="text-sm text-gray-800">${comment.text}</p>
+                            ${imageHTML}
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">${date}</p>
+                    </div>
+                `;
+                commentsList.appendChild(commentEl);
+            });
+        }
+
         function showDiaryDetail(diary) {
             currentDiary = diary; // Store the current diary object
             document.getElementById('detail-title').textContent = diary.title || '日記詳情';
             const detailContainer = document.getElementById('detail-content-container');
             detailContainer.innerHTML = ''; // Clear previous content
 
-            // FIX: Safely parse events if it's a string
             let eventsArray = diary.events;
             if (typeof eventsArray === 'string') {
                 try {
                     eventsArray = JSON.parse(eventsArray);
                 } catch (e) {
                     console.error("Failed to parse diary events:", e);
-                    eventsArray = null; // Set to null on error
+                    eventsArray = [];
                 }
             }
+            
+            const user = auth.currentUser;
+            const likes = diary.likes || [];
+            const isLiked = user ? likes.includes(user.uid) : false;
+            let selectedCommentPhoto = null;
 
-            // Check for the new data structure (with events)
-            if (eventsArray && Array.isArray(eventsArray)) {
-                // RENDER NEW TIMELINE VIEW
-                const summaryHTML = `
-                    <div class="p-5">
-                        <h1 class="text-2xl font-bold text-gray-900">${diary.title}</h1>
-                        <hr class="mt-4 border-gray-200">
-                    </div>
-                `;
-
-                const eventsHTML = `<div class="relative px-5 py-2">${(diary.photoURLs || []).map((imageUrl, index) => {
-                    const event = eventsArray[index] || {}; // Get corresponding event, or empty object
+            const contentHTML = `
+                <div class="p-5">
+                    <h1 class="text-2xl font-bold text-gray-900">${diary.title}</h1>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-2">故事總結</h3>
+                    <p class="mt-1 text-gray-600 leading-relaxed">${diary.overall_story || ''}</p>
+                    <hr class="my-4 border-gray-200">
+                </div>
+                <div class="relative px-5 py-2">${(diary.photoURLs || []).map((imageUrl, index) => {
+                    const event = eventsArray[index] || {};
                     return `
                         <div class="timeline-item">
                              <div class="timeline-dot"></div>
                              <div class="w-full bg-black rounded-lg overflow-hidden mb-4 shadow-lg">
                                 <img src="${imageUrl}" alt="事件照片 ${index + 1}" class="w-full h-auto object-contain block" style="max-height: 70vh;">
-                            </div>
-                            <div class="space-y-2 mb-3">
-                                <div class="flex items-center text-sm text-gray-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span>${event.time || '未知時間'}</span>
-                                </div>
-                                <div class="flex items-center text-sm text-gray-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span>${event.location || '未知地點'}</span>
-                                </div>
-                            </div>
-                            <p class="text-base text-gray-600 leading-relaxed">${event.description || ''}</p>
-                        </div>
-                    `;
-                }).join('')}</div>`;
-
-                detailContainer.innerHTML = summaryHTML + eventsHTML;
-
-            } else {
-                // RENDER OLD (FALLBACK) VIEW for backward compatibility
-                 const coverImage = (diary.photoURLs && diary.photoURLs.length > 0) 
-                    ? diary.photoURLs[0] 
-                    : `https://placehold.co/600x450/6EE7B7/1F2937?text=${encodeURIComponent(diary.title)}`;
-                
-                const diaryDate = diary.diaryDate ? new Date(diary.diaryDate.seconds * 1000).toLocaleDateString('zh-TW') : (diary.createdAt ? diary.createdAt.toDate().toLocaleDateString('zh-TW') : '未知日期');
-
-                let imagesHTML = '';
-                if (diary.photoURLs && diary.photoURLs.length > 1) {
-                    imagesHTML = `<div class="p-5 pt-0"><div class="grid grid-cols-2 gap-4">` +
-                    diary.photoURLs.slice(1).map(url => `
-                        <div>
-                            <img src="${url}" alt="日記照片" class="w-full h-full object-cover rounded-lg shadow-md">
-                        </div>
-                    `).join('') + `</div></div>`;
-                }
-
-                detailContainer.innerHTML = `
-                    <div class="w-full bg-black">
-                        <img src="${coverImage}" alt="日記封面" class="w-full h-auto object-contain block" style="max-height: 70vh;">
-                    </div>
-                    <div class="p-5 space-y-4">
-                        <div class="space-y-2">
-                            <div class="flex items-center text-sm text-gray-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                             </div>
+                            <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 mb-3 text-sm">
+                                <!-- Row 1: Time -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="col-start-1 row-start-1 h-5 w-5 text-sky-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                <span>${diaryDate}</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <span class="col-start-2 row-start-1 text-gray-600">${event.time || '未知時間'}</span>
+                                
+                                <!-- Row 2: Location -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="col-start-1 row-start-2 h-5 w-5 text-rose-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span>${diary.location || '未知地點'}</span>
+                                <span class="col-start-2 row-start-2 text-gray-600">${event.location || '未知地點'}</span>
                             </div>
+                            <p class="text-base text-gray-700 leading-relaxed">${event.description || ''}</p>
                         </div>
-                        <hr class="border-gray-200">
-                        <h1 class="text-2xl font-bold text-gray-900">${diary.title}</h1>
-                        <p id="detail-intro-text" class="text-base text-gray-700 leading-relaxed">${diary.intro || diary.content || '...'}</p>
+                    `;
+                }).join('')}</div>
+                
+                <!-- Interaction & Comments Section -->
+                <div class="p-5 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <button class="like-button flex items-center space-x-2 text-gray-600 hover:text-red-500 transition-colors ${isLiked ? 'liked' : ''}">
+                           <svg class="heart-icon w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.5l1.318-1.182a4.5 4.5 0 116.364 6.364L12 20.25l-7.682-7.682a4.5 4.5 0 010-6.364z" /></svg>
+                            <span id="like-count" class="font-semibold">${likes.length}</span>
+                        </button>
                     </div>
-                    ${imagesHTML}
-                `;
+                    <div class="mt-6">
+                         <h3 class="font-bold text-gray-800 mb-3">留言</h3>
+                         <div id="comments-list" class="space-y-4"></div>
+                         <form id="comment-form" class="mt-4">
+                            <div id="comment-photo-preview-container" class="hidden mb-2 relative w-24 h-24">
+                                <img id="comment-photo-preview" class="w-full h-full object-cover rounded-lg">
+                                <button id="remove-comment-photo" type="button" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center font-bold">&times;</button>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <label for="comment-photo-upload" class="cursor-pointer p-2 text-gray-500 hover:text-amber-500">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                </label>
+                                <input type="file" id="comment-photo-upload" class="hidden" accept="image/*">
+                                <textarea id="comment-input" class="w-full p-2 border rounded-lg bg-gray-50 text-sm" rows="1" placeholder="新增留言..."></textarea>
+                                <button type="submit" class="bg-amber-500 text-white font-semibold px-4 py-2 rounded-lg">送出</button>
+                            </div>
+                         </form>
+                    </div>
+                </div>
+            `;
+            detailContainer.innerHTML = contentHTML;
+
+            // Add event listeners for new elements
+            const likeButton = detailContainer.querySelector('.like-button');
+            if(likeButton) {
+                likeButton.addEventListener('click', async () => {
+                    if (!user || user.isAnonymous) {
+                         guestModal.classList.add('visible');
+                         return;
+                    }
+                    const diaryRef = doc(db, "diaries", diary.id);
+                    const newLikedState = !likeButton.classList.contains('liked');
+                    await updateDoc(diaryRef, {
+                        likes: newLikedState ? arrayUnion(user.uid) : arrayRemove(user.uid)
+                    });
+                });
             }
+            
+            const commentPhotoUpload = detailContainer.querySelector('#comment-photo-upload');
+            const commentPhotoPreviewContainer = detailContainer.querySelector('#comment-photo-preview-container');
+            const commentPhotoPreview = detailContainer.querySelector('#comment-photo-preview');
+            const removeCommentPhoto = detailContainer.querySelector('#remove-comment-photo');
+
+            commentPhotoUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    selectedCommentPhoto = file;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        commentPhotoPreview.src = event.target.result;
+                        commentPhotoPreviewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            removeCommentPhoto.addEventListener('click', () => {
+                selectedCommentPhoto = null;
+                commentPhotoUpload.value = '';
+                commentPhotoPreviewContainer.classList.add('hidden');
+            });
+
+
+            const commentForm = detailContainer.querySelector('#comment-form');
+            if(commentForm) {
+                commentForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!user || user.isAnonymous) {
+                        guestModal.classList.add('visible');
+                        return;
+                    }
+                    const commentInput = document.getElementById('comment-input');
+                    const text = commentInput.value.trim();
+                    
+                    if (!text && !selectedCommentPhoto) return; // Do nothing if both are empty
+
+                    let imageUrl = null;
+                    if (selectedCommentPhoto) {
+                        const filePath = `comments/${user.uid}/${Date.now()}-${selectedCommentPhoto.name}`;
+                        const storageRef = ref(storage, filePath);
+                        const snapshot = await uploadBytes(storageRef, selectedCommentPhoto);
+                        imageUrl = await getDownloadURL(snapshot.ref);
+                    }
+
+                    await addDoc(collection(db, "diaries", diary.id, "comments"), {
+                        text: text,
+                        authorId: user.uid,
+                        authorName: currentUserProfile ? currentUserProfile.displayName : "訪客",
+                        createdAt: serverTimestamp(),
+                        imageUrl: imageUrl
+                    });
+                    
+                    commentInput.value = '';
+                    selectedCommentPhoto = null;
+                    commentPhotoUpload.value = '';
+                    commentPhotoPreviewContainer.classList.add('hidden');
+                });
+            }
+
+            // Listen for real-time comments
+            if (commentsUnsubscribe) commentsUnsubscribe();
+            const commentsQuery = query(collection(db, "diaries", diary.id, "comments"), orderBy("createdAt", "asc"));
+            commentsUnsubscribe = onSnapshot(commentsQuery, (snapshot) => {
+                const comments = [];
+                snapshot.forEach(doc => comments.push(doc.data()));
+                renderComments(comments);
+            });
 
             navigateTo('detail-screen');
         }
@@ -1008,7 +1160,7 @@
                 const date = diary.createdAt ? diary.createdAt.toDate().toLocaleDateString('zh-TW') : '未知日期';
                 const privacyIcon = diary.privacy === 'private' ? '🔒' : diary.privacy === 'group' ? '👨‍👩‍👧‍👦' : '🌐';
                 const coverImage = (diary.photoURLs && diary.photoURLs.length > 0) 
-                    ? diary.photoURLs[0] 
+                    ? diary.photoURLs[diary.coverPhotoIndex || 0] 
                     : `https://placehold.co/600x400/34D399/FFFFFF?text=${encodeURIComponent(diary.title)}`;
 
                 const diaryCard = document.createElement('div');
@@ -1025,22 +1177,71 @@
                 diariesContainer.appendChild(diaryCard);
             });
         }
-
-        onAuthStateChanged(auth, user => {
-            if (diariesUnsubscribe) {
-                diariesUnsubscribe();
+        
+        function updateUserInfo(user, profileData) {
+            const hour = new Date().getHours();
+            let greetingText = "您好！";
+            if (hour < 12) {
+                greetingText = "早安！";
+            } else if (hour < 18) {
+                greetingText = "下午好！";
+            } else {
+                greetingText = "晚安！";
             }
 
+            const settingsAvatar = document.getElementById('settings-avatar');
+            const settingsDisplayName = document.getElementById('settings-display-name');
+            const settingsUsername = document.getElementById('settings-username');
+
+            if (user.isAnonymous) {
+                greeting.textContent = `${greetingText}訪客！`;
+                settingsAvatar.src = `https://placehold.co/100x100/e2e8f0/475569?text=?`;
+                settingsDisplayName.textContent = '訪客';
+                settingsUsername.textContent = '@guest';
+            } else {
+                const displayName = profileData ? profileData.displayName : user.email.split('@')[0];
+                const username = profileData ? profileData.username : `@${user.email.split('@')[0]}`;
+                
+                greeting.textContent = `${greetingText}${displayName}！`;
+                settingsAvatar.src = `https://placehold.co/100x100/fde68a/a16207?text=${displayName.charAt(0).toUpperCase()}`;
+                settingsDisplayName.textContent = displayName;
+                settingsUsername.textContent = username;
+            }
+        }
+
+
+        onAuthStateChanged(auth, async (user) => {
+            if (diariesUnsubscribe) diariesUnsubscribe();
+            if (userProfileUnsubscribe) userProfileUnsubscribe();
+
             if (user) {
-                console.log("User is signed in:", user);
-                if (user.isAnonymous) {
-                    greeting.textContent = "下午好，訪客！";
-                } else {
-                    const name = user.email.split('@')[0];
-                    greeting.textContent = `下午好，${name}！`;
+                console.log("User is signed in:", user.uid);
+                
+                const userDocRef = doc(db, "users", user.uid);
+                if (!user.isAnonymous) {
+                    const docSnap = await getDoc(userDocRef);
+                    if (!docSnap.exists()) {
+                        const name = user.email.split('@')[0];
+                        await setDoc(userDocRef, {
+                            displayName: name,
+                            username: `@${name.toLowerCase()}`,
+                            email: user.email,
+                            bio: "熱愛用照片記錄家庭生活的點點滴滴。"
+                        });
+                    }
                 }
+                
+                userProfileUnsubscribe = onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        currentUserProfile = docSnap.data();
+                        updateUserInfo(user, currentUserProfile);
+                    } else {
+                        updateUserInfo(user, null);
+                    }
+                });
 
                 const q = query(collection(db, "diaries"), where("authorId", "==", user.uid));
+                
                 diariesUnsubscribe = onSnapshot(q, (querySnapshot) => {
                     const diaries = [];
                     querySnapshot.forEach((doc) => {
@@ -1054,12 +1255,20 @@
                     });
 
                     renderDiaries(diaries);
+                    
+                    if (currentDiary && document.getElementById('detail-screen').classList.contains('is-active')) {
+                        const updatedDiary = diaries.find(d => d.id === currentDiary.id);
+                        if (updatedDiary) {
+                            showDiaryDetail(updatedDiary);
+                        }
+                    }
+
                 }, (error) => {
                     console.error("Error getting diaries: ", error);
                     diariesContainer.innerHTML = `
                         <div class="p-4 text-center">
                             <p class="font-bold text-red-600">讀取日記失敗</p>
-                            <p class="text-sm text-gray-600 mt-2">這通常是因為 Firestore 的安全性規則不允許讀取資料。請確認您已在 Firebase 控制台中設定了正確的規則。</p>
+                            <p class="text-sm text-gray-600 mt-2">權限不足，無法讀取資料庫。請檢查您的 Firestore 安全性規則。</p>
                         </div>
                     `;
                 });
@@ -1076,6 +1285,7 @@
                 renderDiaries([]);
                 navigationStack = ['auth-screen'];
                 navigateTo('auth-screen');
+                currentUserProfile = null;
             }
         });
 
@@ -1115,7 +1325,19 @@
             setButtonLoading(registerButton, true);
             authError.textContent = '';
             try {
-                await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                const userCredential = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                const user = userCredential.user;
+                
+                // Create a user profile document
+                const userDocRef = doc(db, "users", user.uid);
+                const name = user.email.split('@')[0];
+                await setDoc(userDocRef, {
+                    displayName: name,
+                    username: `@${name.toLowerCase()}`,
+                    email: user.email,
+                    bio: "熱愛用照片記錄家庭生活的點點滴滴。"
+                });
+
             } catch (error) {
                 authError.textContent = "註冊失敗：" + error.message;
             } finally {
@@ -1170,7 +1392,38 @@
         document.getElementById('go-to-groups').addEventListener('click', () => navigateTo('groups-screen'));
         document.querySelectorAll('#groups-screen .group-item').forEach(item => item.addEventListener('click', () => navigateTo('group-edit-screen')));
         document.getElementById('create-group-button').addEventListener('click', () => navigateTo('group-create-screen'));
-        document.getElementById('go-to-profile-edit').addEventListener('click', () => navigateTo('profile-edit-screen'));
+        
+        document.getElementById('go-to-profile-edit').addEventListener('click', () => {
+            if (currentUserProfile) {
+                document.getElementById('profile-edit-username').value = currentUserProfile.username || '';
+                document.getElementById('profile-edit-display-name').value = currentUserProfile.displayName || '';
+                document.getElementById('profile-edit-bio').value = currentUserProfile.bio || '';
+                document.getElementById('profile-edit-email').value = currentUserProfile.email || '';
+                document.getElementById('profile-edit-avatar').src = `https://placehold.co/100x100/fde68a/a16207?text=${currentUserProfile.displayName.charAt(0).toUpperCase()}`;
+            }
+            navigateTo('profile-edit-screen');
+        });
+
+        document.getElementById('save-profile-button').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const newDisplayName = document.getElementById('profile-edit-display-name').value;
+            const newBio = document.getElementById('profile-edit-bio').value;
+
+            const userDocRef = doc(db, "users", user.uid);
+            try {
+                await updateDoc(userDocRef, {
+                    displayName: newDisplayName,
+                    bio: newBio
+                });
+                goBack();
+            } catch (error) {
+                console.error("Error updating profile: ", error);
+                alert("更新個人資料失敗！");
+            }
+        });
+        
         document.getElementById('go-to-writing-style').addEventListener('click', () => navigateTo('writing-style-screen'));
 
         // --- Create Diary Page ---
@@ -1184,25 +1437,40 @@
 
             selectedFiles.forEach((file, index) => {
                 const wrapper = document.createElement('div');
-                wrapper.className = 'relative aspect-square';
+                wrapper.className = 'relative aspect-square cursor-pointer';
+                wrapper.dataset.index = index;
 
                 const img = document.createElement('img');
                 img.className = "rounded-lg w-full h-full object-cover";
+                if (index === selectedCoverIndex) {
+                    img.classList.add('cover-photo');
+                }
 
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-sm font-bold leading-none hover:bg-red-600 transition-colors z-10';
                 removeBtn.innerHTML = '&times;';
                 removeBtn.title = "移除這張照片";
-                removeBtn.dataset.index = index;
-
+                
                 const orderBadge = document.createElement('div');
-                orderBadge.className = 'absolute top-2 left-2 w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-sm font-bold z-10';
+                orderBadge.className = 'absolute top-2 left-2 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center text-xs font-bold z-10';
                 orderBadge.textContent = index + 1;
+                orderBadge.title = "照片順序";
+
 
                 removeBtn.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    const indexToRemove = parseInt(event.currentTarget.dataset.index, 10);
+                    event.stopPropagation();
+                    const indexToRemove = parseInt(wrapper.dataset.index, 10);
                     selectedFiles.splice(indexToRemove, 1);
+                    if (selectedCoverIndex === indexToRemove) {
+                        selectedCoverIndex = 0;
+                    } else if (selectedCoverIndex > indexToRemove) {
+                        selectedCoverIndex--;
+                    }
+                    renderPhotoPreviews();
+                });
+
+                wrapper.addEventListener('click', () => {
+                    selectedCoverIndex = parseInt(wrapper.dataset.index, 10);
                     renderPhotoPreviews();
                 });
 
@@ -1236,15 +1504,29 @@
         if(photoUpload) {
             photoUpload.addEventListener('change', (event) => {
                 const newFiles = Array.from(event.target.files);
-                selectedFiles.push(...newFiles);
+                
+                newFiles.forEach(newFile => {
+                    // Check for duplicates based on name, size, and last modified date
+                    const isDuplicate = selectedFiles.some(existingFile => 
+                        existingFile.name === newFile.name &&
+                        existingFile.size === newFile.size &&
+                        existingFile.lastModified === newFile.lastModified
+                    );
+
+                    if (!isDuplicate) {
+                        selectedFiles.push(newFile);
+                    }
+                });
+
                 renderPhotoPreviews();
-                event.target.value = '';
+                event.target.value = ''; // Clear the input to allow selecting the same file again after removing it
             });
         }
         
         function resetCreateForm() {
             photoUpload.value = '';
             selectedFiles = [];
+            selectedCoverIndex = 0;
             renderPhotoPreviews();
         }
 
@@ -1302,9 +1584,10 @@
                 }
 
                 const textPrompt = `請根據我提供的 ${selectedFiles.length} 張照片，用${styleText}風格，生成一個JSON物件。物件需包含：
-1. "title": 符合風格的故事標題。
+1. "title": 符合風格的故事標題，長度請勿超過13個字。
 2. "overall_story": 將所有照片串連起來的總結性故事。
-3. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (照片的時間，如果未知請推測), "location" (照片的地點，如果未知請推測具體名稱), "description" (照片的事件描述，100字內)。`;
+3. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (照片的時間，如果未知請推測，格式為 '下午 03:15')、 "location" (照片的地點，如果未知請推測具體名稱，例如 '高雄市，駁二藝術特區')、 "description" (照片的事件描述，100字內)。
+4. "cover_photo_index": 一個數字，代表你認為最適合當封面的照片索引（從0開始）。`;
                 
                 const imageParts = await Promise.all(selectedFiles.map(fileToGenerativePart));
                 
@@ -1328,9 +1611,10 @@
                                         },
                                         "required": ["time", "location", "description"]
                                     }
-                                }
+                                },
+                                "cover_photo_index": { "type": "NUMBER" }
                             },
-                            required: ["title", "overall_story", "events"]
+                            required: ["title", "overall_story", "events", "cover_photo_index"]
                         }
                     }
                 };
@@ -1355,6 +1639,8 @@
                 }
                 const generatedData = JSON.parse(result.candidates[0].content.parts[0].text);
                 
+                const finalCoverIndex = selectedCoverIndex || generatedData.cover_photo_index || 0;
+
                 const diaryData = {
                     title: generatedData.title,
                     overall_story: generatedData.overall_story,
@@ -1362,7 +1648,10 @@
                     privacy: privacy,
                     authorId: user.uid,
                     createdAt: serverTimestamp(),
-                    photoURLs: uploadedPhotoURLs
+                    photoURLs: uploadedPhotoURLs,
+                    likes: [],
+                    style: styleValue,
+                    coverPhotoIndex: finalCoverIndex
                 };
                 
                 const docRef = await addDoc(collection(db, "diaries"), diaryData);
@@ -1401,7 +1690,6 @@
 
                 document.getElementById('edit-title').value = currentDiary.title || '';
                 document.getElementById('edit-overall-story').value = currentDiary.overall_story || '';
-                document.getElementById('edit-privacy-select').value = currentDiary.privacy || 'private';
                 
                 const eventsContainer = document.getElementById('edit-events-container');
                 eventsContainer.innerHTML = ''; // Clear previous
@@ -1430,7 +1718,6 @@
 
                 const newTitle = document.getElementById('edit-title').value;
                 const newOverallStory = document.getElementById('edit-overall-story').value;
-                const newPrivacy = document.getElementById('edit-privacy-select').value;
                 const descriptionElements = document.querySelectorAll('.edit-event-description');
                 
                 let currentEvents = currentDiary.events;
@@ -1452,7 +1739,6 @@
                 const updatedData = {
                     title: newTitle,
                     overall_story: newOverallStory,
-                    privacy: newPrivacy,
                     events: JSON.stringify(newEvents)
                 };
 
@@ -1598,7 +1884,7 @@
             await signOut(auth);
             navigateTo('auth-screen');
         });
-
+        
     </script>
 </body>
 </html>
