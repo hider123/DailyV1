@@ -229,11 +229,23 @@
             box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
             border: 2px solid white;
         }
+        
+        /* --- Toast Notification --- */
+        #toast-notification.show {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
     <div class="mobile-screen">
+        <!-- Toast Notification -->
+        <div id="toast-notification" class="absolute top-0 left-1/2 -translate-x-1/2 mt-12 px-6 py-3 rounded-full shadow-lg text-white font-semibold text-sm z-50 transition-all duration-300 ease-in-out transform -translate-y-20 opacity-0">
+            <p id="toast-message"></p>
+        </div>
+
         <div class="page-container">
 
             <!-- ================================================== -->
@@ -1604,7 +1616,7 @@
                 goBack();
             } catch (error) {
                 console.error("Error updating profile: ", error);
-                alert("更新個人資料失敗！");
+                showToast("更新個人資料失敗！", "error");
             }
         });
         
@@ -1868,7 +1880,7 @@
                 }
 
                 if (!Array.isArray(eventsArray)) {
-                    alert("此日記格式不支援編輯。");
+                    showToast("此日記格式不支援編輯。", "error");
                     return;
                 }
 
@@ -1896,7 +1908,7 @@
         if(saveButton) {
             saveButton.addEventListener('click', async () => {
                 if (!currentDiary || !currentDiary.id) {
-                    alert("找不到要儲存的日記！");
+                    showToast("找不到要儲存的日記！", "error");
                     return;
                 }
 
@@ -1930,14 +1942,13 @@
                     const diaryRef = doc(db, "diaries", currentDiary.id);
                     await updateDoc(diaryRef, updatedData);
                     
-                    // Update the local currentDiary object and re-render the detail page
                     currentDiary = { ...currentDiary, ...updatedData };
-                    goBack(); // Go back to detail screen
-                    showDiaryDetail(currentDiary); // Re-render with new data
+                    goBack(); 
+                    showDiaryDetail(currentDiary); 
 
                 } catch (error) {
                     console.error("更新日記失敗:", error);
-                    alert("儲存失敗，請稍後再試。");
+                    showToast("儲存失敗，請稍後再試。", "error");
                 }
             });
         }
@@ -1953,8 +1964,7 @@
             document.querySelectorAll('.share-group-button').forEach(button => {
                 button.addEventListener('click', () => {
                     const groupName = button.querySelector('span:last-child').textContent;
-                    // Replace alert with a custom modal in a real app
-                    alert(`日記已分享給 ${groupName}！`);
+                    showToast(`已分享給 ${groupName}！`);
                     modalContainer.classList.remove('visible');
                 });
             });
@@ -1963,10 +1973,7 @@
             copyButton.addEventListener('click', () => {
                 const linkInput = copyButton.previousElementSibling;
                 navigator.clipboard.writeText(linkInput.value).then(() => {
-                    copyButton.textContent = '已複製!';
-                    copyButton.classList.remove('bg-amber-500');
-                    copyButton.classList.add('bg-green-500');
-                    setTimeout(() => { copyButton.textContent = '複製'; copyButton.classList.remove('bg-green-500'); copyButton.classList.add('bg-amber-500'); }, 2000);
+                    showToast('連結已複製！');
                 });
             });
         }
@@ -1998,8 +2005,7 @@
                 e.target.disabled = true;
                 e.target.classList.remove('bg-blue-500');
                 e.target.classList.add('bg-gray-200', 'text-gray-500', 'cursor-not-allowed');
-                // Replace alert with a custom modal in a real app
-                alert('已送出邀請！');
+                showToast('已送出邀請！');
             });
         });
         
@@ -2015,8 +2021,7 @@
              copyInviteLinkButton.addEventListener('click', () => {
                 const linkInput = copyInviteLinkButton.previousElementSibling;
                 navigator.clipboard.writeText(linkInput.value).then(() => {
-                     // Replace alert with a custom modal in a real app
-                    alert('邀請連結已複製！');
+                    showToast('邀請連結已複製！');
                 });
             });
         }
@@ -2069,14 +2074,35 @@
             navigateTo('auth-screen');
         });
 
-        // --- NEW: Adventure Page Navigation ---
         document.querySelectorAll('.adventure-card').forEach(card => {
             card.addEventListener('click', () => {
-                // In a real app, you'd pass an ID to load specific adventure data.
-                // For this prototype, we just navigate to the pre-filled detail page.
                 navigateTo('adventure-detail-screen');
             });
         });
+
+        const toastElement = document.getElementById('toast-notification');
+        const toastMessage = document.getElementById('toast-message');
+        let toastTimeout;
+
+        function showToast(message, type = 'success') {
+            clearTimeout(toastTimeout);
+
+            toastMessage.textContent = message;
+
+            toastElement.classList.remove('bg-green-500', 'bg-red-500', 'show');
+
+            if (type === 'success') {
+                toastElement.classList.add('bg-green-500');
+            } else if (type === 'error') {
+                toastElement.classList.add('bg-red-500');
+            }
+
+            toastElement.classList.add('show');
+
+            toastTimeout = setTimeout(() => {
+                toastElement.classList.remove('show');
+            }, 3000);
+        }
         
     </script>
 </body>
