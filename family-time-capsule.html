@@ -560,11 +560,19 @@
             <!-- ================================================== -->
             <div id="detail-screen" class="page">
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-20 flex justify-between items-center border-b border-gray-200 flex-shrink-0">
-                    <button class="go-back-button text-gray-600 hover:text-gray-900 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg><span>返回</span></button>
-                    <h1 id="detail-title" class="text-base font-bold text-gray-800 truncate px-2">陽明山繡球花之旅</h1>
-                    <div class="flex items-center space-x-4">
-                        <button id="share-button" class="text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg></button>
-                        <button id="edit-button" class="text-gray-600 hover:text-gray-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" /></svg></button>
+                    <button class="go-back-button text-gray-600 hover:text-gray-900 flex items-center w-20"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg><span>返回</span></button>
+                    
+                    <!-- Center Content -->
+                    <div class="flex-1 flex flex-col justify-center items-center overflow-hidden h-full">
+                        <div id="detail-header-content" class="flex items-center space-x-2">
+                            <img id="detail-author-avatar" class="w-6 h-6 rounded-full bg-gray-200" style="display: none;">
+                            <p id="detail-header-text" class="text-2xl font-bold text-gray-800 truncate"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2 w-20 justify-end">
+                        <button id="share-button" class="text-gray-600 hover:text-gray-900 p-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg></button>
+                        <button id="edit-button" class="text-gray-600 hover:text-gray-900 p-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" /></svg></button>
                     </div>
                 </header>
                 <div class="overflow-y-auto flex-1">
@@ -1046,6 +1054,25 @@
         let selectedFiles = []; // To store selected files globally
         let currentDiary = null; // To hold the currently viewed diary object
         let selectedCoverIndex = 0; // To store the user-selected cover photo index
+        const userProfileCache = {}; // Cache for author profiles
+
+        async function getAuthorProfile(authorId) {
+            if (userProfileCache[authorId]) {
+                return userProfileCache[authorId];
+            }
+            try {
+                const userDocRef = doc(db, "users", authorId);
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists()) {
+                    const profile = docSnap.data();
+                    userProfileCache[authorId] = profile;
+                    return profile;
+                }
+            } catch (e) {
+                console.error("Could not fetch author profile:", e);
+            }
+            return null;
+        }
 
         function showPage(targetId, isSubPage = false) {
             pages.forEach(page => {
@@ -1111,20 +1138,41 @@
             });
         }
 
-        function showDiaryDetail(diary) {
-            currentDiary = diary; // Store the current diary object
-            document.getElementById('detail-title').textContent = diary.title || '日記詳情';
+        async function showDiaryDetail(diary) {
+            currentDiary = diary; 
             const detailContainer = document.getElementById('detail-content-container');
-            detailContainer.innerHTML = ''; // Clear previous content
+            detailContainer.innerHTML = ''; 
+
+            const authorAvatar = document.getElementById('detail-author-avatar');
+            const headerTextElement = document.getElementById('detail-header-text');
+            let mainTitleText = '';
+            const title = diary.title || '';
+            const parts = title.split(/[:：]/);
+
+            if (parts.length > 1) {
+                const headerText = parts[0].trim();
+                mainTitleText = parts.slice(1).join(':').trim();
+                authorAvatar.style.display = 'none';
+                headerTextElement.textContent = headerText;
+            } else {
+                const authorProfile = await getAuthorProfile(diary.authorId);
+                authorAvatar.style.display = 'block';
+                if (authorProfile) {
+                    const name = authorProfile.displayName || '作者';
+                    authorAvatar.src = `https://placehold.co/100x100/fde68a/a16207?text=${name.charAt(0).toUpperCase()}`;
+                    headerTextElement.textContent = name;
+                } else {
+                    authorAvatar.src = 'https://placehold.co/100x100/e2e8f0/475569?text=?';
+                    headerTextElement.textContent = '匿名作者';
+                }
+                mainTitleText = title;
+            }
+            
+            const date = diary.createdAt ? diary.createdAt.toDate().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 
             let eventsArray = diary.events;
             if (typeof eventsArray === 'string') {
-                try {
-                    eventsArray = JSON.parse(eventsArray);
-                } catch (e) {
-                    console.error("Failed to parse diary events:", e);
-                    eventsArray = [];
-                }
+                try { eventsArray = JSON.parse(eventsArray); } catch (e) { eventsArray = []; }
             }
             
             const user = auth.currentUser;
@@ -1134,7 +1182,8 @@
 
             const contentHTML = `
                 <div class="p-5">
-                    <h1 class="text-2xl font-bold text-gray-900 text-center mb-8">${diary.title}</h1>
+                    <p class="text-lg text-gray-500 mb-2">${date}</p>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-8">${mainTitleText}</h1>
                      <div class="summary-note">
                          <p class="text-2xl text-gray-700 leading-relaxed">${diary.overall_story || ''}</p>
                      </div>
@@ -1149,17 +1198,9 @@
                                 <img src="${imageUrl}" alt="事件照片 ${index + 1}" class="w-full h-auto object-contain block" style="max-height: 70vh;">
                              </div>
                             <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 mb-3 text-sm">
-                                <!-- Row 1: Time -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="col-start-1 row-start-1 h-5 w-5 text-sky-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="col-start-1 row-start-1 h-5 w-5 text-sky-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <span class="col-start-2 row-start-1 text-gray-600">${event.time || '未知時間'}</span>
-                                
-                                <!-- Row 2: Location -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="col-start-1 row-start-2 h-5 w-5 text-rose-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="col-start-1 row-start-2 h-5 w-5 text-rose-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                 <span class="col-start-2 row-start-2 text-gray-600">${event.location || '未知地點'}</span>
                             </div>
                             <p class="text-base text-gray-700 leading-relaxed">${event.description || ''}</p>
@@ -1167,7 +1208,6 @@
                     `;
                 }).join('')}</div>
                 
-                <!-- Interaction & Comments Section -->
                 <div class="p-5 border-t border-gray-200">
                     <div class="flex items-center justify-between">
                         <button class="like-button flex items-center space-x-2 text-gray-600 hover:text-red-500 transition-colors ${isLiked ? 'liked' : ''}">
@@ -1197,7 +1237,6 @@
             `;
             detailContainer.innerHTML = contentHTML;
 
-            // Add event listeners for new elements
             const likeButton = detailContainer.querySelector('.like-button');
             if(likeButton) {
                 likeButton.addEventListener('click', async () => {
@@ -1249,7 +1288,7 @@
                     const commentInput = document.getElementById('comment-input');
                     const text = commentInput.value.trim();
                     
-                    if (!text && !selectedCommentPhoto) return; // Do nothing if both are empty
+                    if (!text && !selectedCommentPhoto) return;
 
                     let imageUrl = null;
                     if (selectedCommentPhoto) {
@@ -1274,7 +1313,6 @@
                 });
             }
 
-            // Listen for real-time comments
             if (commentsUnsubscribe) commentsUnsubscribe();
             const commentsQuery = query(collection(db, "diaries", diary.id, "comments"), orderBy("createdAt", "asc"));
             commentsUnsubscribe = onSnapshot(commentsQuery, (snapshot) => {
