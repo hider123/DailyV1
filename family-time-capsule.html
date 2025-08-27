@@ -12,6 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <!-- EXIF Data Reader Library -->
     <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <!-- SortableJS Library for Drag and Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
@@ -234,6 +236,12 @@
         #toast-notification.show {
             transform: translate(-50%, 0);
             opacity: 1;
+        }
+
+        /* --- SortableJS --- */
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #fde68a;
         }
 
     </style>
@@ -550,13 +558,8 @@
                 <header class="p-4 pt-8 bg-white/80 backdrop-blur-sm sticky top-0 z-20 flex justify-between items-center border-b border-gray-200 flex-shrink-0">
                     <button class="go-back-button text-gray-600 hover:text-gray-900 flex items-center w-20"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg><span>返回</span></button>
                     
-                    <!-- Center Content -->
-                    <div class="flex-1 flex flex-col justify-center items-center overflow-hidden h-full">
-                        <div id="detail-header-content" class="flex items-center space-x-2">
-                            <img id="detail-author-avatar" class="w-6 h-6 rounded-full bg-gray-200" style="display: none;">
-                            <p id="detail-header-text" class="text-2xl font-bold text-gray-800 truncate"></p>
-                        </div>
-                    </div>
+                    <!-- Center Content (Blank) -->
+                    <div class="flex-1"></div>
 
                     <div class="flex items-center space-x-2 w-20 justify-end">
                         <button id="share-button" class="text-gray-600 hover:text-gray-900 p-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" /></svg></button>
@@ -1012,7 +1015,7 @@
             apiKey: "AIzaSyAoVd0MJy5TjwuEF8xPntGmyu3tpHEUuts",
             authDomain: "family-time-capsule-ac438.firebaseapp.com",
             projectId: "family-time-capsule-ac438",
-            storageBucket: "family-time-capsule-ac438.appspot.com",
+            storageBucket: "family-time-capsule-ac438.firebasestorage.app",
             messagingSenderId: "717537356458",
             appId: "1:717537356458:web:59caf3c60cd45d2529bed3"
         };
@@ -1131,31 +1134,7 @@
             const detailContainer = document.getElementById('detail-content-container');
             detailContainer.innerHTML = ''; 
 
-            const authorAvatar = document.getElementById('detail-author-avatar');
-            const headerTextElement = document.getElementById('detail-header-text');
-            let mainTitleText = '';
-            const title = diary.title || '';
-            const parts = title.split(/[:：]/);
-
-            if (parts.length > 1) {
-                const headerText = parts[0].trim();
-                mainTitleText = parts.slice(1).join(':').trim();
-                authorAvatar.style.display = 'none';
-                headerTextElement.textContent = headerText;
-            } else {
-                const authorProfile = await getAuthorProfile(diary.authorId);
-                authorAvatar.style.display = 'block';
-                if (authorProfile) {
-                    const name = authorProfile.displayName || '作者';
-                    authorAvatar.src = `https://placehold.co/100x100/fde68a/a16207?text=${name.charAt(0).toUpperCase()}`;
-                    headerTextElement.textContent = name;
-                } else {
-                    authorAvatar.src = 'https://placehold.co/100x100/e2e8f0/475569?text=?';
-                    headerTextElement.textContent = '匿名作者';
-                }
-                mainTitleText = title;
-            }
-            
+            const mainTitleText = diary.title || '';
             const date = diary.createdAt ? diary.createdAt.toDate().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 
             let eventsArray = diary.events;
@@ -1168,7 +1147,6 @@
             const isLiked = user ? likes.includes(user.uid) : false;
             let selectedCommentPhoto = null;
 
-            // --- NEW: Itinerary Summary Logic ---
             let itineraryHTML = '';
             if (eventsArray && eventsArray.length > 0) {
                 const startTime = eventsArray[0].time;
@@ -1201,19 +1179,25 @@
                 </div>
                 <div class="relative px-5 py-2">${(diary.photoURLs || []).map((imageUrl, index) => {
                     const event = eventsArray[index] || {};
+                    let dateDisplayHTML = '';
+                    if (event.actualDate) {
+                        const photoDate = new Date(event.actualDate);
+                        const formattedDate = photoDate.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+                        dateDisplayHTML = `<p class="flex items-center"><span class="text-xl mr-2">📅</span> ${formattedDate}</p>`;
+                    }
                     return `
                         <div class="timeline-item">
                              <div class="timeline-dot"></div>
-                             <div class="w-full bg-black rounded-lg overflow-hidden mb-4 shadow-lg">
+                             <div class="w-full bg-black rounded-lg overflow-hidden mb-2 shadow-lg">
                                 <img src="${imageUrl}" alt="事件照片 ${index + 1}" class="w-full h-auto object-contain block" style="max-height: 70vh;">
                              </div>
-                            <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 mb-3 text-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="col-start-1 row-start-1 h-5 w-5 text-sky-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <span class="col-start-2 row-start-1 text-gray-600">${event.time || '未知時間'}</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="col-start-1 row-start-2 h-5 w-5 text-rose-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                <span class="col-start-2 row-start-2 text-gray-600">${event.location || '未知地點'}</span>
+                             
+                            <div class="space-y-2 mt-3 text-sm text-gray-700 font-medium">
+                                ${dateDisplayHTML}
+                                <p class="flex items-center"><span class="text-xl mr-2">🕒</span> ${event.time || '未知時間'}</p>
+                                <p class="flex items-center"><span class="text-xl mr-2">📍</span> ${event.location || '未知地點'}</p>
                             </div>
-                            <p class="text-base text-gray-700 leading-relaxed">${event.description || ''}</p>
+                            <p class="text-base text-gray-700 leading-relaxed mt-3">${event.description || ''}</p>
                         </div>
                     `;
                 }).join('')}</div>
@@ -1650,7 +1634,8 @@
         function renderPhotoPreviews() {
             photoGridContainer.innerHTML = ''; 
 
-            selectedFiles.forEach((file, index) => {
+            selectedFiles.forEach((item, index) => {
+                const file = item.file;
                 const wrapper = document.createElement('div');
                 wrapper.className = 'relative aspect-square cursor-pointer';
                 wrapper.dataset.index = index;
@@ -1716,27 +1701,53 @@
             }
         }
 
-        if(photoUpload) {
-            photoUpload.addEventListener('change', (event) => {
-                const newFiles = Array.from(event.target.files);
-                
-                newFiles.forEach(newFile => {
-                    // Check for duplicates based on name, size, and last modified date
-                    const isDuplicate = selectedFiles.some(existingFile => 
-                        existingFile.name === newFile.name &&
-                        existingFile.size === newFile.size &&
-                        existingFile.lastModified === newFile.lastModified
-                    );
+        photoUpload.addEventListener('change', async (event) => {
+            const newFiles = Array.from(event.target.files);
+            if (newFiles.length === 0) return;
 
+            showToast('正在讀取照片資訊...');
+
+            const getExifDateTime = (file) => {
+                return new Promise((resolve) => {
+                    EXIF.getData(file, function() {
+                        const dateTime = EXIF.getTag(this, "DateTimeOriginal") || EXIF.getTag(this, "DateTime");
+                        if (dateTime) {
+                            const [datePart, timePart] = dateTime.split(' ');
+                            const formattedDate = datePart.replace(/:/g, '-');
+                            resolve(new Date(`${formattedDate}T${timePart}`));
+                        } else {
+                            resolve(new Date(file.lastModified));
+                        }
+                    });
+                });
+            };
+
+            try {
+                const newFilesWithDate = await Promise.all(newFiles.map(async (file) => {
+                    return { file, date: await getExifDateTime(file) };
+                }));
+
+                newFilesWithDate.forEach(newFileObj => {
+                    const isDuplicate = selectedFiles.some(existingFileObj => 
+                        existingFileObj.file.name === newFileObj.file.name &&
+                        existingFileObj.file.size === newFileObj.file.size &&
+                        existingFileObj.file.lastModified === newFileObj.file.lastModified
+                    );
                     if (!isDuplicate) {
-                        selectedFiles.push(newFile);
+                        selectedFiles.push(newFileObj);
                     }
                 });
 
+                selectedFiles.sort((a, b) => a.date - b.date);
+
                 renderPhotoPreviews();
-                event.target.value = ''; // Clear the input to allow selecting the same file again after removing it
-            });
-        }
+            } catch (error) {
+                console.error("Error processing photos:", error);
+                showToast("讀取照片時間失敗", "error");
+            } finally {
+                event.target.value = ''; 
+            }
+        });
         
         function resetCreateForm() {
             photoUpload.value = '';
@@ -1781,9 +1792,10 @@
             const styleText = styleMapping[styleValue] || '溫馨感性風';
             
             try {
+                const filesToUpload = selectedFiles.map(item => item.file);
                 const uploadedPhotoURLs = [];
-                if (selectedFiles.length > 0) {
-                    const uploadPromises = selectedFiles.map(async (file) => {
+                if (filesToUpload.length > 0) {
+                    const uploadPromises = filesToUpload.map(async (file) => {
                         const options = {
                             maxSizeMB: 1,
                             maxWidthOrHeight: 1920,
@@ -1797,14 +1809,15 @@
                     });
                     uploadedPhotoURLs.push(...await Promise.all(uploadPromises));
                 }
-
-                const textPrompt = `請根據我提供的 ${selectedFiles.length} 張照片，用${styleText}風格，生成一個JSON物件。物件需包含：
+                
+                const photoTimes = selectedFiles.map(item => item.date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: true }));
+                const textPrompt = `請根據我提供的 ${filesToUpload.length} 張照片，用${styleText}風格，生成一個JSON物件。這些照片的拍攝時間依序為：${photoTimes.join(', ')}。請務必參考這些時間來撰寫事件，並用更有趣、活潑的方式描述時間(例如: "陽光燦爛的午後"、"晚餐時間")。物件需包含：
 1. "title": 符合風格的故事標題，長度請勿超過14個字。
 2. "overall_story": 將所有照片串連起來的總結性故事，長度請勿超過100個字。
-3. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (照片的時間，如果未知請推測，格式為 '下午 03:15')、 "location" (照片的地點，如果未知請推測具體名稱，例如 '高雄市，駁二藝術特區')、 "description" (照片的事件描述，100字內)。
+3. "events": 一個陣列，陣列中每個物件代表一張照片，包含 "time" (必須使用我提供對應的時間，並用活潑的方式描述)、 "location" (照片的地點，如果未知請推測具體名稱，例如 '高雄市，駁二藝術特區')、 "description" (照片的事件描述，100字內)。
 4. "cover_photo_index": 一個數字，代表你認為最適合當封面的照片索引（從0開始）。`;
                 
-                const imageParts = await Promise.all(selectedFiles.map(fileToGenerativePart));
+                const imageParts = await Promise.all(filesToUpload.map(fileToGenerativePart));
                 
                 const payload = {
                     contents: [{ parts: [{ text: textPrompt }, ...imageParts] }],
@@ -1855,11 +1868,19 @@
                 const generatedData = JSON.parse(result.candidates[0].content.parts[0].text);
                 
                 const finalCoverIndex = selectedCoverIndex || generatedData.cover_photo_index || 0;
+                
+                const eventsWithDate = generatedData.events.map((event, index) => {
+                    const photoDate = selectedFiles[index] ? selectedFiles[index].date : new Date();
+                    return {
+                        ...event,
+                        actualDate: photoDate.toISOString() 
+                    };
+                });
 
                 const diaryData = {
                     title: generatedData.title,
                     overall_story: generatedData.overall_story,
-                    events: JSON.stringify(generatedData.events),
+                    events: JSON.stringify(eventsWithDate),
                     privacy: privacy,
                     authorId: user.uid,
                     createdAt: serverTimestamp(),
@@ -1910,10 +1931,28 @@
                 eventsContainer.innerHTML = ''; // Clear previous
                 
                 eventsArray.forEach((event, index) => {
+                    const eventDate = event.actualDate ? new Date(event.actualDate).toISOString().split('T')[0] : '';
                     const eventEditorHTML = `
-                        <div>
-                            <label class="text-base font-semibold text-gray-600">事件 ${index + 1} 描述</label>
-                            <textarea data-event-index="${index}" class="edit-event-description w-full mt-1 p-2 border border-gray-300 rounded-lg h-20">${event.description || ''}</textarea>
+                        <div class="bg-gray-50 p-4 rounded-lg border" data-event-index="${index}">
+                            <p class="font-bold mb-3 text-gray-700">事件 ${index + 1}</p>
+                            <div class="grid grid-cols-2 gap-4 mb-2">
+                                <div>
+                                    <label class="text-sm font-semibold text-gray-600">日期</label>
+                                    <input type="date" value="${eventDate}" class="edit-event-date w-full mt-1 p-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="text-sm font-semibold text-gray-600">時間</label>
+                                    <input type="text" value="${event.time || ''}" class="edit-event-time w-full mt-1 p-2 border border-gray-300 rounded-lg">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="text-sm font-semibold text-gray-600">地點</label>
+                                <input type="text" value="${event.location || ''}" class="edit-event-location w-full mt-1 p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-gray-600">描述</label>
+                                <textarea class="edit-event-description w-full mt-1 p-2 border border-gray-300 rounded-lg h-20">${event.description || ''}</textarea>
+                            </div>
                         </div>
                     `;
                     eventsContainer.insertAdjacentHTML('beforeend', eventEditorHTML);
@@ -1933,22 +1972,18 @@
 
                 const newTitle = document.getElementById('edit-title').value;
                 const newOverallStory = document.getElementById('edit-overall-story').value;
-                const descriptionElements = document.querySelectorAll('.edit-event-description');
+                const eventEditorElements = document.querySelectorAll('#edit-events-container > div');
                 
-                let currentEvents = currentDiary.events;
-                 if (typeof currentEvents === 'string') {
-                     try {
-                        currentEvents = JSON.parse(currentEvents);
-                     } catch(e) {
-                         currentEvents = [];
-                     }
-                }
+                const newEvents = Array.from(eventEditorElements).map(container => {
+                    const date = container.querySelector('.edit-event-date').value;
+                    const time = container.querySelector('.edit-event-time').value;
+                    const location = container.querySelector('.edit-event-location').value;
+                    const description = container.querySelector('.edit-event-description').value;
 
-                const newEvents = Array.from(descriptionElements).map((textarea, index) => {
-                    return {
-                        ...currentEvents[index], // Preserve time and location
-                        description: textarea.value
-                    };
+                    // Reconstruct the actualDate from date and a default time if needed
+                    const actualDate = new Date(`${date}T12:00:00`).toISOString();
+
+                    return { actualDate, time, location, description };
                 });
 
                 const updatedData = {
